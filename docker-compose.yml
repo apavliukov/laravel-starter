@@ -1,5 +1,5 @@
 services:
-    laravel.test:
+    app:
         build:
             context: './docker/8.4'
             dockerfile: Dockerfile
@@ -37,7 +37,7 @@ services:
             MYSQL_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
-            - 'sail-mysql:/var/lib/mysql'
+            - './docker/volumes/mysql:/var/lib/mysql'
             - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
             - sail
@@ -69,13 +69,16 @@ services:
         ports:
             - '${FORWARD_MAILPIT_PORT:-1025}:1025'
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        volumes:
+            - './docker/volumes/mailpit:/data'
+        environment:
+            MP_MAX_MESSAGES: 5000
+            MP_DATA_FILE: '/data/mailpit.db'
         networks:
             - sail
 networks:
     sail:
         driver: bridge
 volumes:
-    sail-mysql:
-        driver: local
     sail-redis:
         driver: local
