@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
@@ -7,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class PasswordUpdateTest extends TestCase
+final class PasswordUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -15,7 +17,7 @@ class PasswordUpdateTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this
+        $testResponse = $this
             ->actingAs($user)
             ->from('/profile')
             ->put('/password', [
@@ -24,7 +26,7 @@ class PasswordUpdateTest extends TestCase
                 'password_confirmation' => 'new-password',
             ]);
 
-        $response
+        $testResponse
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
@@ -35,7 +37,7 @@ class PasswordUpdateTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this
+        $testResponse = $this
             ->actingAs($user)
             ->from('/profile')
             ->put('/password', [
@@ -44,7 +46,7 @@ class PasswordUpdateTest extends TestCase
                 'password_confirmation' => 'new-password',
             ]);
 
-        $response
+        $testResponse
             ->assertSessionHasErrorsIn('updatePassword', 'current_password')
             ->assertRedirect('/profile');
     }

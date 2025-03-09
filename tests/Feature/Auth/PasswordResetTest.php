@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
@@ -8,15 +10,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-class PasswordResetTest extends TestCase
+final class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_reset_password_link_screen_can_be_rendered(): void
     {
-        $response = $this->get('/forgot-password');
+        $testResponse = $this->get('/forgot-password');
 
-        $response->assertStatus(200);
+        $testResponse->assertStatus(200);
     }
 
     public function test_reset_password_link_can_be_requested(): void
@@ -38,10 +40,10 @@ class PasswordResetTest extends TestCase
 
         $this->post('/forgot-password', ['email' => $user->email]);
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get('/reset-password/'.$notification->token);
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification): true {
+            $testResponse = $this->get('/reset-password/'.$notification->token);
 
-            $response->assertStatus(200);
+            $testResponse->assertStatus(200);
 
             return true;
         });
@@ -55,15 +57,15 @@ class PasswordResetTest extends TestCase
 
         $this->post('/forgot-password', ['email' => $user->email]);
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user): true {
+            $testResponse = $this->post('/reset-password', [
                 'token' => $notification->token,
                 'email' => $user->email,
                 'password' => 'password',
                 'password_confirmation' => 'password',
             ]);
 
-            $response
+            $testResponse
                 ->assertSessionHasNoErrors()
                 ->assertRedirect(route('login'));
 
