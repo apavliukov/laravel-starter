@@ -1,0 +1,15 @@
+{
+    "preset": "laravel",
+    "exclude": ["_ide_helper.php", "_ide_helper_models.php", ".phpstorm.meta.php"],
+    "notName": ["*.blade.php", "_ide_helper_*.php"],
+    "rules": {
+        "class_attributes_separation": {
+            "elements": {
+                "method": "one"
+            }
+        },
+        "no_extra_blank_lines": {
+            "tokens": ["extra", "use", "use_trait"]
+        }
+    }
+}
