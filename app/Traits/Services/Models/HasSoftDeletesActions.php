@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @phpstan-ignore trait.unused
+ */
 trait HasSoftDeletesActions
 {
     /**

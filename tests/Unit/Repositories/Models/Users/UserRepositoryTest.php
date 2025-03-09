@@ -61,7 +61,7 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
         $count = 3;
         $this->userGenerator->createUserCollection(count: $count);
 
-        $this->assertEquals($count, $this->repository->all()->count());
+        $this->assertCount($count, $this->repository->all());
     }
 
     public function test_all_action_returns_collection_with_all_attributes_if_default_parameters_are_set(): void
@@ -112,8 +112,8 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
     {
         $this->userGenerator->createUserCollection();
 
-        $allUsers = $this->repository->paginate();
-        $user = $allUsers->items()[0];
+        $lengthAwarePaginator = $this->repository->paginate();
+        $user = $lengthAwarePaginator->items()[0];
 
         $this->assertModelHasCorrectAttributes($user);
     }
@@ -123,8 +123,8 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
         $this->userGenerator->createUserCollection();
 
         $columns = ['id', 'name'];
-        $allUsers = $this->repository->paginate(columns: $columns);
-        $user = $allUsers->items()[0];
+        $lengthAwarePaginator = $this->repository->paginate(columns: $columns);
+        $user = $lengthAwarePaginator->items()[0];
 
         $this->assertModelHasCorrectAttributes($user, $columns);
     }
@@ -136,7 +136,7 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
 
         $user->delete();
 
-        $this->assertNull($this->repository->find($userId));
+        $this->assertNotInstanceOf(\Illuminate\Database\Eloquent\Model::class, $this->repository->find($userId));
     }
 
     public function test_find_action_returns_correct_model_if_it_exists(): void
@@ -168,10 +168,10 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
     public function test_create_action_returns_model(): void
     {
         $data = $this->userGenerator->generateData(onlyFillable: true);
-        $user = $this->repository->create($data);
+        $model = $this->repository->create($data);
 
-        $this->assertDatabaseHas($user->getTable(), [
-            'id' => $user->id,
+        $this->assertDatabaseHas($model->getTable(), [
+            'id' => $model->id,
         ]);
     }
 

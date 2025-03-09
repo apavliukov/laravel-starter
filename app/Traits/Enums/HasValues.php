@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Traits\Enums;
 
+/**
+ * @phpstan-ignore trait.unused
+ */
 trait HasValues
 {
     public static function values(): array

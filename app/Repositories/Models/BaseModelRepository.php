@@ -22,6 +22,8 @@ abstract class BaseModelRepository extends BaseRepository implements ModelReposi
 
     /**
      * Get model class
+     *
+     * @return class-string<Model>
      */
     abstract protected function getModelClass(): string;
 
@@ -51,6 +53,8 @@ abstract class BaseModelRepository extends BaseRepository implements ModelReposi
 
     /**
      * Create a model
+     *
+     * @param array<string, mixed> $data
      */
     public function create(array $data): Model
     {

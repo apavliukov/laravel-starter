@@ -10,8 +10,8 @@ use App\Repositories\Models\BaseModelRepository;
 /**
  * @property User $modelClass
  *
- * @method User|null find(int $id, array $columns = ['*'])
- * @method User create(array $data)
+ * @method User|null find(int $id, string[] $columns = ['*'])
+ * @method User create(mixed[] $data)
  */
 class UserRepository extends BaseModelRepository
 {

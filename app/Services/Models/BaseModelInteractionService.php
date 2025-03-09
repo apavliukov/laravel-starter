@@ -13,14 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModelInteractionService extends BaseService implements ModelInteractionServiceInterface
 {
-    public function __construct(protected ModelRepositoryInterface $repository) {}
+    public function __construct(protected ModelRepositoryInterface $modelRepository) {}
 
     /**
      * Get all models
      */
     public function all(array $columns = ['*']): Collection
     {
-        return $this->repository->all($columns);
+        return $this->modelRepository->all($columns);
     }
 
     /**
@@ -28,7 +28,7 @@ abstract class BaseModelInteractionService extends BaseService implements ModelI
      */
     public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
     {
-        return $this->repository->paginate($perPage, $columns);
+        return $this->modelRepository->paginate($perPage, $columns);
     }
 
     /**
@@ -36,7 +36,7 @@ abstract class BaseModelInteractionService extends BaseService implements ModelI
      */
     public function find(int $id, array $columns = ['*']): ?Model
     {
-        return $this->repository->find($id, $columns);
+        return $this->modelRepository->find($id, $columns);
     }
 
     /**
@@ -48,7 +48,7 @@ abstract class BaseModelInteractionService extends BaseService implements ModelI
             return null;
         }
 
-        return $this->repository->create($data);
+        return $this->modelRepository->create($data);
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class BaseModelInteractionService extends BaseService implements ModelI
      */
     public function update(Model $model, array $data): bool
     {
-        return $this->repository->update($model, $data);
+        return $this->modelRepository->update($model, $data);
     }
 
     /**
@@ -64,6 +64,6 @@ abstract class BaseModelInteractionService extends BaseService implements ModelI
      */
     public function delete(Model $model): ?bool
     {
-        return $this->repository->delete($model);
+        return $this->modelRepository->delete($model);
     }
 }

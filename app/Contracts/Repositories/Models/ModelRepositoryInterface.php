@@ -11,6 +11,8 @@ interface ModelRepositoryInterface extends ModelInteractionInterface
 {
     /**
      * Create a model
+     *
+     * @param array<string, mixed> $data
      */
     public function create(array $data): Model;
 }

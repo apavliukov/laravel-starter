@@ -12,7 +12,7 @@ return RectorConfig::configure()
         __DIR__.'/app',
         __DIR__.'/config',
         __DIR__.'/database',
-//        __DIR__.'/lang',
+        //        __DIR__.'/lang',
         __DIR__.'/routes',
         __DIR__.'/tests',
     ])
@@ -26,12 +26,12 @@ return RectorConfig::configure()
         codeQuality: true,
         codingStyle: true,
         typeDeclarations: true,
-       	naming: true,
+        naming: true,
         instanceOf: true,
         earlyReturn: true,
         strictBooleans: true,
-       	carbon: true,
-       	rectorPreset: true,
+        carbon: true,
+        rectorPreset: true,
         phpunitCodeQuality: true,
     )
     ->withPhpSets(
@@ -41,5 +41,5 @@ return RectorConfig::configure()
         phpunit: true,
     )
     ->withSkip([
-    //    StringToClassConstantRector::class
+        //    StringToClassConstantRector::class
     ]);

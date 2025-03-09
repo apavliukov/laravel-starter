@@ -1,7 +1,9 @@
 <?php
+
 declare(strict_types=1);
 use Hammerstone\Airdrop\Triggers\ConfigTrigger;
 use Hammerstone\Airdrop\Triggers\FileTrigger;
+
 return [
     /*
      * Here you can register all of the classes that will be used in determining

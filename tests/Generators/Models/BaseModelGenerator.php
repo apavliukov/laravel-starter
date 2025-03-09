@@ -14,7 +14,7 @@ abstract class BaseModelGenerator extends BaseGenerator
 {
     protected Factory $factory;
 
-    public function __construct(protected BaseModelInteractionService $modelService)
+    public function __construct(protected BaseModelInteractionService $baseModelInteractionService)
     {
         $this->factory = $this->getFactory();
     }
