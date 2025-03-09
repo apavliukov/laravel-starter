@@ -2,19 +2,45 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "dev": "vite",
         "build": "vite build",
-        "dev": "vite"
+        "eslint-fix": "eslint --fix .",
+        "prettier-fix": "prettier --write ."
+    },
+    "dependencies": {
+        "globals": "^16.0.0"
     },
     "devDependencies": {
-        "@tailwindcss/forms": "^0.5.2",
-        "alpinejs": "^3.4.2",
-        "autoprefixer": "^10.4.2",
-        "axios": "^1.7.4",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^1.2.0",
+        "@babel/cli": "^7.26.4",
+        "@babel/core": "^7.26.9",
+        "@babel/eslint-parser": "^7.26.8",
+        "@babel/preset-env": "^7.26.9",
+        "@commitlint/cli": "^19.8.0",
+        "@commitlint/config-conventional": "^19.8.0",
+        "@eslint/js": "^9.22.0",
+        "@fullhuman/postcss-purgecss": "^7.0.2",
+        "@tailwindcss/aspect-ratio": "^0.4.2",
+        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/postcss": "^4.0.12",
+        "alpinejs": "^3.14.8",
+        "cssnano": "^7.0.6",
+        "eslint": "^9.22.0",
+        "eslint-config-prettier": "^10.1.1",
+        "eslint-plugin-import": "^2.31.0",
+        "eslint-plugin-prettier": "^5.2.3",
+        "laravel-vite-plugin": "^1.2",
         "lefthook": "^1.11.3",
-        "postcss": "^8.4.31",
-        "tailwindcss": "^3.1.0",
-        "vite": "^6.0.11"
+        "postcss": "^8.5.3",
+        "postcss-merge-rules": "^7.0.4",
+        "postcss-preset-env": "^10.1.5",
+        "prettier": "^3.5.3",
+        "prettier-plugin-tailwindcss": "^0.6.11",
+        "sass": "^1.85.1",
+        "tailwindcss": "^4.0.12",
+        "vite": "^6.2",
+        "vite-plugin-static-copy": "^2.3.0"
+    },
+    "imports": {
+        "#*": "./resources/js/*"
     }
 }

@@ -8,11 +8,6 @@
 pre-commit:
   parallel: true
   commands:
-    stylelint:
-      tags: frontend
-      glob: "resources/**/*.{scss,css}"
-      run: yarn run stylelint --fix {staged_files}
-      stage_fixed: true
     eslint:
       tags: frontend
       glob: "resources/**/*.js"
@@ -26,10 +21,10 @@ pre-commit:
     rector:
       tags: backend
       glob: "*.php"
-      run: docker compose -f docker-compose.local.yml exec -T app composer run-script rector-fix {staged_files}
+      run: docker compose -f docker-compose.yml exec -T app composer run-script rector-fix {staged_files}
       stage_fixed: true
     pint:
       tags: backend
       glob: "*.php"
-      run: docker compose -f docker-compose.local.yml exec -T app composer run-script pint {staged_files}
+      run: docker compose -f docker-compose.yml exec -T app composer run-script pint {staged_files}
       stage_fixed: true
