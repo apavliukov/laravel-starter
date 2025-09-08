@@ -11,7 +11,7 @@ use App\Services\Models\Users\UserInteractionService;
 use Illuminate\Support\ServiceProvider;
 use Tests\Generators\Models\Users\UserGenerator;
 
-class ModelRepositoryServiceProvider extends ServiceProvider
+final class ModelRepositoryServiceProvider extends ServiceProvider
 {
     public function register(): void
     {

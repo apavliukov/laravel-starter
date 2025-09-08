@@ -9,8 +9,5 @@ use Illuminate\Database\Eloquent\Model;
 
 interface ModelInteractionServiceInterface extends ModelInteractionInterface
 {
-    /**
-     * Create a model
-     */
     public function create(array $data): ?Model;
 }

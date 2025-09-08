@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 if (! function_exists('get_model_table')) {
     /**
-     * @param class-string<Model> $modelClass
-     *
-     * @return string
+     * @param  class-string<Model>  $modelClass
      */
     function get_model_table(string $modelClass): string
     {

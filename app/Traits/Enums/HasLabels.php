@@ -10,8 +10,6 @@ namespace App\Traits\Enums;
 trait HasLabels
 {
     /**
-     * Get all labels
-     *
      * @return array<string>
      */
     public static function getLabels(): array

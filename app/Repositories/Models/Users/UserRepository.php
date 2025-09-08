@@ -13,11 +13,8 @@ use App\Repositories\Models\BaseModelRepository;
  * @method User|null find(int $id, string[] $columns = ['*'])
  * @method User create(mixed[] $data)
  */
-class UserRepository extends BaseModelRepository
+final readonly class UserRepository extends BaseModelRepository
 {
-    /**
-     * Get model class
-     */
     protected function getModelClass(): string
     {
         return User::class;

@@ -9,29 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 
 interface ModelSoftDeleteInteractionInterface
 {
-    /**
-     * Find a model by id incl. trashed
-     *
-     * @param array<string> $columns
-     */
     public function findWithTrashed(int $id, array $columns = ['*']): ?Model;
 
     /**
-     * Paginate models incl. trashed
-     *
-     * @param array<string> $columns
-     *
      * @return LengthAwarePaginator<Model>
      */
     public function paginateWithTrashed(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator;
 
-    /**
-     * Restore a model
-     */
     public function restore(Model $model): bool;
 
-    /**
-     * Permanently delete a model
-     */
     public function forceDelete(Model $model): ?bool;
 }
