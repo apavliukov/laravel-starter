@@ -1,7 +1,12 @@
 {
     "preset": "laravel",
-    "exclude": ["_ide_helper.php", "_ide_helper_models.php", ".phpstorm.meta.php"],
-    "notName": ["*.blade.php", "_ide_helper_*.php"],
+    "exclude": [
+        "docker/**",
+        "_ide_helper.php",
+        "_ide_helper_models.php",
+        ".phpstorm.meta.php"
+    ],
+    "notName": ["*.blade.php", "_ide_helper_*.php", ".phpstorm.meta.php"],
     "rules": {
         "class_attributes_separation": {
             "elements": {

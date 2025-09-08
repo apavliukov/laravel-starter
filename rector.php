@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Transform\Rector\String_\StringToClassConstantRector;
 use RectorLaravel\Set\LaravelLevelSetList;
 use RectorLaravel\Set\LaravelSetList;
 
@@ -26,7 +25,6 @@ return RectorConfig::configure()
         codeQuality: true,
         codingStyle: true,
         typeDeclarations: true,
-        naming: true,
         instanceOf: true,
         earlyReturn: true,
         strictBooleans: true,
@@ -35,11 +33,12 @@ return RectorConfig::configure()
         phpunitCodeQuality: true,
     )
     ->withPhpSets(
-        php83: true,
+        php84: true,
     )
     ->withAttributesSets(
         phpunit: true,
     )
     ->withSkip([
-        //    StringToClassConstantRector::class
+        __DIR__.'/_ide_helper.php',
+        __DIR__.'/_ide_helper_models.php',
     ]);
