@@ -15,7 +15,7 @@ pre-commit:
       stage_fixed: true
     prettier:
       tags: frontend
-      glob: "resources/**/*.{scss,css,js}"
+      glob: "resources/**/*.{css,js}"
       run: yarn run prettier --write {staged_files}
       stage_fixed: true
     rector:

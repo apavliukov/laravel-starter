@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../../resources/**/*.{html,css,js,jsx,ts,tsx,vue,php,twig}';
+@source '../../../storage/framework/views/*.php';
+@source '../../../app/**/*.php';
+
+@plugin "@tailwindcss/forms";
+
+@theme {
+    --font-sans: 'figtree', 'sans';
+}
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}

@@ -12,7 +12,7 @@ declare(strict_types=1);
 
         <title>{{ config('app.name') }}</title>
 
-        @vite(['resources/scss/main.scss'])
+        @vite(['resources/css/main.css'])
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -36,4 +36,4 @@ declare(strict_types=1);
         @vite(['resources/js/main.js'])
     </body>
 </html>
-<?php 
+<?php

@@ -1,8 +1,9 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import { existsSync } from 'fs';
 import path from "path";
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import tailwindcss from "@tailwindcss/vite";
 
 if (existsSync('.airdrop_skip')) {
     console.log('Assets already exist. Skipping compilation.');
@@ -13,10 +14,11 @@ if (existsSync('.airdrop_skip')) {
 
 export default defineConfig({
     plugins: [
+        tailwindcss(),
         laravel({
             input: [
-                // SCSS
-                'resources/scss/main.scss',
+                // CSS
+                'resources/css/main.css',
 
                 // JS
                 'resources/js/main.js',
@@ -31,10 +33,29 @@ export default defineConfig({
                 },
             ],
         }),
+        sentryVitePlugin({
+            org: process.env.VITE_SENTRY_ORGANIZATION,
+            project: process.env.VITE_SENTRY_PROJECT,
+            telemetry: false,
+        }),
     ],
     resolve: {
         alias: {
             'fonts-path': path.resolve(__dirname, 'resources/fonts'),
         },
+    },
+    build: {
+        sourcemap: true
+    },
+    server: {
+        watch: {
+            ignored: [
+                '**/.idea',
+                '**/vendor/**',
+                '**/bootstrap/cache/**',
+                '**/docker/**',
+                '**/storage/**',
+            ]
+        }
     },
 });
