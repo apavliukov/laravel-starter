@@ -1,6 +1,7 @@
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import { existsSync } from 'fs';
 import path from "path";
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import tailwindcss from "@tailwindcss/vite";
