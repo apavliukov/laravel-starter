@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Strict\Rector\Ternary\DisallowedShortTernaryRuleFixerRector;
 use RectorLaravel\Set\LaravelLevelSetList;
 use RectorLaravel\Set\LaravelSetList;
 
@@ -14,6 +15,13 @@ return RectorConfig::configure()
         //        __DIR__.'/lang',
         __DIR__.'/routes',
         __DIR__.'/tests',
+    ])
+    ->withSkip([
+        '_ide_helper.php',
+        '_ide_helper_models.php',
+        '.phpstorm.meta.php',
+        'resources/views/**/*.blade.php',
+        DisallowedShortTernaryRuleFixerRector::class,
     ])
     ->withSets([
         LaravelLevelSetList::UP_TO_LARAVEL_110,
@@ -28,7 +36,6 @@ return RectorConfig::configure()
         instanceOf: true,
         earlyReturn: true,
         strictBooleans: true,
-        carbon: true,
         rectorPreset: true,
         phpunitCodeQuality: true,
     )
@@ -37,8 +44,4 @@ return RectorConfig::configure()
     )
     ->withAttributesSets(
         phpunit: true,
-    )
-    ->withSkip([
-        __DIR__.'/_ide_helper.php',
-        __DIR__.'/_ide_helper_models.php',
-    ]);
+    );
