@@ -26,14 +26,14 @@ export default defineConfig({
             ],
             refresh: true,
         }),
-        viteStaticCopy({
-            targets: [
-                {
-                    src: 'resources/img',
-                    dest: 'assets',
-                },
-            ],
-        }),
+        // viteStaticCopy({
+        //     targets: [
+        //         {
+        //             src: 'resources/img',
+        //             dest: 'assets',
+        //         },
+        //     ],
+        // }),
         sentryVitePlugin({
             org: process.env.VITE_SENTRY_ORGANIZATION,
             project: process.env.VITE_SENTRY_PROJECT,
