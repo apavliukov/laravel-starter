@@ -1,11 +1,8 @@
 import '#bootstrap';
-import { startAlpine } from '#common/vendor/alpine';
 
 class Main {
     init = () => {
-        document.addEventListener('DOMContentLoaded', () => {
-            startAlpine();
-        });
+        // TODO find a way to register custom alpine data components
     };
 }
 
