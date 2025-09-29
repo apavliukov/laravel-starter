@@ -42,7 +42,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            'fonts-path': path.resolve(__dirname, 'resources/fonts'),
+            '~fonts-path': path.resolve(__dirname, 'resources/fonts'),
         },
     },
     build: {
