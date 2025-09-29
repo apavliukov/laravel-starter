@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -61,7 +62,7 @@ final class AppServiceProvider extends ServiceProvider
     private function enforceMorphMap(): void
     {
         $models = [
-            //
+            User::class,
         ];
 
         $morphMap = array_reduce($models, static function (array $result, string $model): array {
