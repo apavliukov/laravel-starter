@@ -35,7 +35,7 @@ final class AppServiceProvider extends ServiceProvider
         Model::shouldBeStrict(false); // TODO change in next phases of development
 
         if ($this->app->isProduction()) {
-            Model::handleLazyLoadingViolationUsing(static function ($model, $relation): void {
+            Model::handleLazyLoadingViolationUsing(static function ($model, string $relation): void {
                 $fullTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, limit: 6);
                 $trace = array_pop($fullTrace);
                 $fileParts = explode('/', $trace['file']);
@@ -84,6 +84,6 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerLogViewerAuth(): void
     {
-        LogViewer::auth(static fn (Request $request): bool => $request->user()?->hasVerifiedEmail() ?? false);
+        LogViewer::auth(static fn (Request $request): bool => ! app()->isProduction() || ($request->user()?->hasVerifiedEmail() ?? false));
     }
 }

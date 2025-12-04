@@ -7,6 +7,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\Models\HasRelationTypeName;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,12 +42,14 @@ final class User extends Authenticatable
         ];
     }
 
-    public function initials(): string
+    protected function initials(): Attribute
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
-            ->implode('');
+        return new Attribute(
+            get: fn (): string => Str::of($this->name)
+                ->explode(' ')
+                ->take(2)
+                ->map(fn ($word) => Str::substr($word, 0, 1))
+                ->implode(''),
+        );
     }
 }

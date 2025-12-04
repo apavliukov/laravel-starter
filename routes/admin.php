@@ -2,13 +2,33 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\Common\SettingsController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])
+Route::redirect('/', '/admin');
+
+Route::middleware(['auth', 'verified'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
-        Route::get('/', DashboardController::class)
-            ->name('dashboard');
+        Route::prefix('settings')
+            ->name('settings.')
+            ->controller(SettingsController::class)
+            ->group(function (): void {
+                Route::redirect('/', '/settings/profile');
+
+                Route::get('/profile', 'profile')
+                    ->name('profile');
+                Route::get('/password', 'password')
+                    ->name('password');
+                Route::get('/appearance', 'appearance')
+                    ->name('appearance');
+            });
+
+        Route::prefix('app')
+            ->name('app.')
+            ->group(base_path('routes/admin/app.php'));
+
+        Route::name('client.')
+            ->group(base_path('routes/admin/client.php'));
     });

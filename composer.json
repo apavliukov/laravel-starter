@@ -21,6 +21,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
         "barryvdh/laravel-ide-helper": "^3.5",
+        "dg/bypass-finals": "^1.9",
         "driftingly/rector-laravel": "^2.0",
         "fakerphp/faker": "^1.23",
         "jasonmccreary/laravel-test-assertions": "^2.6",

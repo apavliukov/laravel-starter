@@ -1,0 +1,11 @@
+/* Common */
+@import '../common/common.css';
+
+/* Admin-specific sources */
+@source '../../../resources/views/components/layouts/app.blade.php';
+@source '../../../resources/views/livewire/admin/**/*.blade.php';
+@source '../../../resources/views/components/admin/**/*.blade.php';
+@source '../../../resources/views/pages/admin/**/*.blade.php';
+@source '../../../resources/js/admin/**/*.{js,ts,jsx,tsx}';
+@source '../../../app/Livewire/Admin/**/*.php';
+@source '../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

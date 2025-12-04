@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+    <head>
+        @include('partials.head.admin')
+    </head>
+    <body class="min-h-screen bg-white dark:bg-zinc-800">
+        <x-common.ui.navigation.layouts.sidebar />
+
+        <flux:main>
+            {{ $slot }}
+        </flux:main>
+
+        <x-common.ui.toast />
+
+        @vite(['resources/js/admin/admin.js'])
+        @fluxScripts
+        @livewireScriptConfig
+    </body>
+</html>

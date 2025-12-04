@@ -1,4 +1,4 @@
-import Alpine from 'alpinejs';
+import { Livewire } from '#/../../vendor/livewire/livewire/dist/livewire.esm';
 
 const componentInitQueue = [];
 
@@ -7,19 +7,22 @@ const runComponentInits = () => {
         return;
     }
 
-    document.addEventListener('livewire:init', () => {
-        componentInitQueue.forEach((initFunction) => {
-            initFunction();
+    const callback = () => {
+        componentInitQueue.forEach(({ name, component }) => {
+            window.Alpine.data(name, component);
         });
-    });
+    };
+
+    document.addEventListener('alpine:init', callback, { once: true });
+    document.addEventListener('livewire:navigated', callback);
 };
 
-const queueComponentInit = (initFunction) => {
-    if (typeof initFunction !== 'function') {
+const queueComponentInit = (name, component) => {
+    if (typeof component !== 'function') {
         return;
     }
 
-    componentInitQueue.push(initFunction);
+    componentInitQueue.push({ name, component });
 };
 
 export const startAlpine = () => {
@@ -27,22 +30,22 @@ export const startAlpine = () => {
         return;
     }
 
-    if (typeof window.Alpine !== 'object') {
-        window.Alpine = Alpine;
+    if (typeof window.Livewire !== 'object') {
+        window.Livewire = Livewire;
     }
 
     runComponentInits();
 
-    Alpine.start();
+    window.Livewire.start();
     window.alpineStarted = true;
 };
 
 export const initAlpineComponents = (components) => {
-    if (!components.length) {
+    if (!components || typeof components !== 'object') {
         return;
     }
 
-    components.forEach((component) => {
-        queueComponentInit(component);
+    Object.entries(components).forEach(([name, component]) => {
+        queueComponentInit(name, component);
     });
 };

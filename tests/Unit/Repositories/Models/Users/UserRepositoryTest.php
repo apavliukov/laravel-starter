@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Repositories\Models\Users;
 
 use App\Models\User;
-use App\Repositories\BaseRepository;
 use App\Repositories\Models\Users\UserRepository;
+use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\Generators\Models\Users\UserGenerator;
 use Tests\Unit\Repositories\Models\ModelRepositoryTestCase;
 
-#[Group('central')]
 #[Group('models')]
 #[Group('users')]
 #[Group('repositories')]
@@ -22,31 +21,13 @@ use Tests\Unit\Repositories\Models\ModelRepositoryTestCase;
  */
 final class UserRepositoryTest extends ModelRepositoryTestCase
 {
-    protected UserGenerator $userGenerator;
+    private UserGenerator $userGenerator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->userGenerator = resolve(UserGenerator::class);
-    }
-
-    /**
-     * Get model class
-     */
-    protected function getModelClass(): string
-    {
-        return User::class;
-    }
-
-    /**
-     * Get repository object
-     *
-     * @return UserRepository
-     */
-    protected function getRepository(): BaseRepository
-    {
-        return new UserRepository;
     }
 
     public function test_all_action_returns_empty_collection_if_no_users(): void
@@ -136,7 +117,7 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
 
         $user->delete();
 
-        $this->assertNotInstanceOf(\Illuminate\Database\Eloquent\Model::class, $this->repository->find($userId));
+        $this->assertNotInstanceOf(Model::class, $this->repository->find($userId));
     }
 
     public function test_find_action_returns_correct_model_if_it_exists(): void
@@ -221,5 +202,21 @@ final class UserRepositoryTest extends ModelRepositoryTestCase
         $user->delete();
 
         $this->assertNull($this->repository->delete($user));
+    }
+
+    /**
+     * Get model class
+     */
+    protected function getModelClass(): string
+    {
+        return User::class;
+    }
+
+    /**
+     * Get repository object
+     */
+    protected function getRepository(): UserRepository
+    {
+        return new UserRepository;
     }
 }

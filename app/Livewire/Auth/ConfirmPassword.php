@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Auth;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -32,8 +33,8 @@ final class ConfirmPassword extends Component
             ]);
         }
 
-        session(['auth.password_confirmed_at' => \Carbon\Carbon::now()->getTimestamp()]);
+        session(['auth.password_confirmed_at' => Date::now()->getTimestamp()]);
 
-        $this->redirectIntended(default: route('client.dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('admin.client.dashboard', absolute: false), navigate: true);
     }
 }

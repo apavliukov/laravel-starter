@@ -1,16 +1,16 @@
 <flux:header container-fluid class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
     <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
-    <a href="{{ route('client.dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0" wire:navigate>
+    <a href="{{ route('admin.client.dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0" wire:navigate>
         <x-app-logo />
     </a>
 
     <flux:navbar class="-mb-px max-lg:hidden">
-        <flux:navbar.item icon="layout-grid" :href="route('client.dashboard')" :current="request()->routeIs('client.dashboard')" wire:navigate>
+        <flux:navbar.item icon="layout-grid" :href="route('admin.client.dashboard')" :current="request()->routeIs('admin.client.dashboard')" wire:navigate>
             {{ __('Client Dashboard') }}
         </flux:navbar.item>
 
-        <flux:navbar.item icon="layout-grid" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
+        <flux:navbar.item icon="layout-grid" :href="route('admin.app.dashboard')" :current="request()->routeIs('admin.app.dashboard')" wire:navigate>
             {{ __('Admin Dashboard') }}
         </flux:navbar.item>
     </flux:navbar>
@@ -20,7 +20,7 @@
     <flux:dropdown position="top" align="end">
         <flux:profile
             class="cursor-pointer"
-            :initials="auth()->user()->initials()"
+            :initials="auth()->user()->initials"
         />
 
         <flux:menu>
@@ -31,7 +31,7 @@
                                     <span
                                         class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
                                     >
-                                        {{ auth()->user()->initials() }}
+                                        {{ auth()->user()->initials }}
                                     </span>
                                 </span>
 
@@ -46,7 +46,7 @@
             <flux:menu.separator />
 
             <flux:menu.radio.group>
-                <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                <flux:menu.item :href="route('admin.settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
             </flux:menu.radio.group>
 
             <flux:menu.separator />
@@ -64,17 +64,17 @@
 <flux:sidebar stashable sticky class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
     <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-    <a href="{{ route('client.dashboard') }}" class="ms-1 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+    <a href="{{ route('admin.client.dashboard') }}" class="ms-1 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
         <x-app-logo />
     </a>
 
     <flux:navlist variant="outline">
         <flux:navlist.group :heading="__('Client')" class="grid">
-            <flux:navlist.item icon="home" :href="route('client.dashboard')" :current="request()->routeIs('client.dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+            <flux:navlist.item icon="home" :href="route('admin.client.dashboard')" :current="request()->routeIs('admin.client.dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
         </flux:navlist.group>
 
         <flux:navlist.group :heading="__('Admin')" class="grid">
-            <flux:navlist.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+            <flux:navlist.item icon="home" :href="route('admin.app.dashboard')" :current="request()->routeIs('admin.app.dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
         </flux:navlist.group>
     </flux:navlist>
 </flux:sidebar>

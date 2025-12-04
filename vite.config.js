@@ -1,10 +1,10 @@
-import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import { existsSync } from 'fs';
-import path from "path";
+import path from 'path';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite';
 
 if (existsSync('.airdrop_skip')) {
     console.log('Assets already exist. Skipping compilation.');
@@ -19,10 +19,12 @@ export default defineConfig({
         laravel({
             input: [
                 // CSS
-                'resources/css/main.css',
+                'resources/css/admin/admin.css',
+                'resources/css/web/web.css',
 
                 // JS
-                'resources/js/main.js',
+                'resources/js/admin/admin.js',
+                'resources/js/web/web.js',
             ],
             refresh: true,
         }),
@@ -43,12 +45,14 @@ export default defineConfig({
     resolve: {
         alias: {
             '~fonts-path': path.resolve(__dirname, 'resources/fonts'),
+            '~node-modules': path.resolve(__dirname, 'node_modules'),
         },
     },
     build: {
-        sourcemap: true
+        sourcemap: true,
     },
     server: {
+        cors: true,
         watch: {
             ignored: [
                 '**/.idea',
@@ -56,7 +60,7 @@ export default defineConfig({
                 '**/bootstrap/cache/**',
                 '**/docker/**',
                 '**/storage/**',
-            ]
-        }
+            ],
+        },
     },
 });

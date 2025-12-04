@@ -1,0 +1,10 @@
+/* Common */
+@import '../common/common.css';
+
+/* Web-specific sources */
+@source '../../../resources/views/components/layouts/web.blade.php';
+@source '../../../resources/views/livewire/web/**/*.blade.php';
+@source '../../../resources/views/components/web/**/*.blade.php';
+@source '../../../resources/views/pages/web/**/*.blade.php';
+@source '../../../resources/js/web/**/*.{js,ts,jsx,tsx}';
+@source '../../../app/Livewire/Web/**/*.php';

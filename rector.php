@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
-use Rector\Strict\Rector\Ternary\DisallowedShortTernaryRuleFixerRector;
-use RectorLaravel\Set\LaravelLevelSetList;
+use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use RectorLaravel\Set\LaravelSetList;
+use RectorLaravel\Set\LaravelSetProvider;
 
 return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/app',
+        __DIR__.'/bootstrap/app.php',
         __DIR__.'/config',
         __DIR__.'/database',
-        //        __DIR__.'/lang',
+        __DIR__.'/public',
         __DIR__.'/routes',
         __DIR__.'/tests',
     ])
@@ -21,27 +23,38 @@ return RectorConfig::configure()
         '_ide_helper_models.php',
         '.phpstorm.meta.php',
         'resources/views/**/*.blade.php',
-        DisallowedShortTernaryRuleFixerRector::class,
+        AddOverrideAttributeToOverriddenMethodsRector::class,
     ])
+    ->withSetProviders(LaravelSetProvider::class)
+    ->withComposerBased(laravel: true)
     ->withSets([
-        LaravelLevelSetList::UP_TO_LARAVEL_110,
+        LaravelSetList::LARAVEL_ARRAYACCESS_TO_METHOD_CALL,
+        LaravelSetList::LARAVEL_ARRAY_STR_FUNCTION_TO_STATIC_CALL,
         LaravelSetList::LARAVEL_CODE_QUALITY,
         LaravelSetList::LARAVEL_COLLECTION,
+        LaravelSetList::LARAVEL_CONTAINER_STRING_TO_FULLY_QUALIFIED_NAME,
+        LaravelSetList::LARAVEL_ELOQUENT_MAGIC_METHOD_TO_QUERY_BUILDER,
+        LaravelSetList::LARAVEL_FACADE_ALIASES_TO_FULL_NAMES,
+        LaravelSetList::LARAVEL_FACTORIES,
+        LaravelSetList::LARAVEL_IF_HELPERS,
+        LaravelSetList::LARAVEL_LEGACY_FACTORIES_TO_CLASSES,
     ])
+    ->withImportNames(
+        removeUnusedImports: true,
+    )
+    ->withCache(
+        cacheDirectory: '/tmp/rector',
+        cacheClass: FileCacheStorage::class,
+    )
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,
-        codingStyle: true,
         typeDeclarations: true,
-        instanceOf: true,
+        privatization: true,
         earlyReturn: true,
         strictBooleans: true,
-        rectorPreset: true,
-        phpunitCodeQuality: true,
     )
-    ->withPhpSets(
-        php84: true,
-    )
+    ->withPhpSets()
     ->withAttributesSets(
         phpunit: true,
     );

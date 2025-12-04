@@ -25,3 +25,15 @@ yarn-error.log
 
 /docker/volumes
 .phpstorm.meta.php
+
+# Yarn 4
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# State file (don’t commit)
+.yarn/install-state.gz
+yarn-error.log

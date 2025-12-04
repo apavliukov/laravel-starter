@@ -22,35 +22,35 @@ services:
         networks:
             - sail
         depends_on:
-#            - mysql
+            - mysql
 #            - pgsql
             - redis
             - mailpit
-    pgsql:
-        image: 'postgres:17'
-        ports:
-            - '${FORWARD_DB_PORT:-5432}:5432'
-        environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: '${DB_DATABASE}'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
-        volumes:
-            - './docker/volumes/pgsql:/var/lib/postgresql/data'
-            - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - pg_isready
-                - '-q'
-                - '-d'
-                - '${DB_DATABASE}'
-                - '-U'
-                - '${DB_USERNAME}'
-            retries: 3
-            timeout: 5s
+#    pgsql:
+#        image: 'postgres:17'
+#        ports:
+#            - '${FORWARD_DB_PORT:-5432}:5432'
+#        environment:
+#            PGPASSWORD: '${DB_PASSWORD:-secret}'
+#            POSTGRES_DB: '${DB_DATABASE}'
+#            POSTGRES_USER: '${DB_USERNAME}'
+#            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+#        volumes:
+#            - './docker/volumes/pgsql:/var/lib/postgresql/data'
+#            - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
+#        networks:
+#            - sail
+#        healthcheck:
+#            test:
+#                - CMD
+#                - pg_isready
+#                - '-q'
+#                - '-d'
+#                - '${DB_DATABASE}'
+#                - '-U'
+#                - '${DB_USERNAME}'
+#            retries: 3
+#            timeout: 5s
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:

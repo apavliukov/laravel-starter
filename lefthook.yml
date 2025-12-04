@@ -6,24 +6,27 @@
 #    commitlint:
 #      run: yarn run commitlint --edit "{1}"
 pre-commit:
-  parallel: true
   commands:
     eslint:
+      priority: 1
       tags: frontend
       glob: "resources/**/*.js"
       run: yarn run eslint --fix {staged_files}
       stage_fixed: true
     prettier:
+      priority: 2
       tags: frontend
       glob: "resources/**/*.{css,js}"
       run: yarn run prettier --write {staged_files}
       stage_fixed: true
     rector:
+      priority: 3
       tags: backend
       glob: "*.php"
       run: docker compose -f docker-compose.yml exec -T app composer run-script rector-fix {staged_files}
       stage_fixed: true
     pint:
+      priority: 4
       tags: backend
       glob: "*.php"
       run: docker compose -f docker-compose.yml exec -T app composer run-script pint {staged_files}

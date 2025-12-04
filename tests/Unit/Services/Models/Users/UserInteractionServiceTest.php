@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\Group;
 use Tests\Generators\Models\Users\UserGenerator;
 use Tests\Unit\Services\Models\ModelServiceTestCase;
 
-#[Group('central')]
 #[Group('models')]
 #[Group('users')]
 #[Group('services')]
@@ -25,29 +24,13 @@ use Tests\Unit\Services\Models\ModelServiceTestCase;
  */
 final class UserInteractionServiceTest extends ModelServiceTestCase
 {
-    protected UserGenerator $userGenerator;
+    private UserGenerator $userGenerator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->userGenerator = resolve(UserGenerator::class);
-    }
-
-    /**
-     * Get model class
-     */
-    protected function getModelClass(): string
-    {
-        return User::class;
-    }
-
-    /**
-     * Get service object
-     */
-    protected function getService(): UserInteractionService
-    {
-        return resolve(UserInteractionService::class);
     }
 
     public function bindUserRepository(Closure $closure): void
@@ -151,5 +134,21 @@ final class UserInteractionServiceTest extends ModelServiceTestCase
         });
 
         $this->assertTrue($this->service->delete($user));
+    }
+
+    /**
+     * Get model class
+     */
+    protected function getModelClass(): string
+    {
+        return User::class;
+    }
+
+    /**
+     * Get service object
+     */
+    protected function getService(): UserInteractionService
+    {
+        return resolve(UserInteractionService::class);
     }
 }
