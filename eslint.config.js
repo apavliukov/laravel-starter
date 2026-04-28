@@ -1,4 +1,3 @@
-import babelParser from '@babel/eslint-parser';
 import js from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import eslintImport from 'eslint-plugin-import';
@@ -23,10 +22,8 @@ export default [
             globals: {
                 ...globals.browser,
             },
-            parser: babelParser,
-            parserOptions: {
-                requireConfigFile: false,
-            },
+            ecmaVersion: 'latest',
+            sourceType: 'module',
         },
         plugins: {
             import: eslintImport,
