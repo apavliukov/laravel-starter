@@ -25,10 +25,10 @@ Route::middleware(['auth', 'verified'])
                     ->name('appearance');
             });
 
-        Route::prefix('app')
-            ->name('app.')
-            ->group(base_path('routes/admin/app.php'));
+        Route::prefix('platform')
+            ->name('platform.')
+            ->group(base_path('routes/admin/platform.php'));
 
-        Route::name('client.')
-            ->group(base_path('routes/admin/client.php'));
+        Route::name('member.')
+            ->group(base_path('routes/admin/member.php'));
     });

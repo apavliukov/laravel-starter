@@ -40,6 +40,6 @@ final class Register extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('admin.client.dashboard', absolute: false), navigate: true);
+        $this->redirect(route('admin.member.dashboard', absolute: false), navigate: true);
     }
 }
