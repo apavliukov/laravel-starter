@@ -11,17 +11,17 @@ abstract class ServiceTestCase extends TestCase
 {
     protected BaseService $service;
 
-    /**
-     * Get service object
-     */
-    abstract protected function getService(): BaseService;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->service = $this->getService();
     }
+
+    /**
+     * Get service object
+     */
+    abstract protected function getService(): BaseService;
 
     protected function bindMocks(array $bindings): void
     {

@@ -6,7 +6,7 @@ namespace App\Contracts\Enums;
 
 interface StringMatchInterface
 {
-    public function toString(): string;
-
     public static function fromString(string $value): ?self;
+
+    public function toString(): string;
 }

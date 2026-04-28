@@ -25,32 +25,32 @@ abstract readonly class BaseModelRepository extends BaseRepository implements Mo
      */
     abstract protected function getModelClass(): string;
 
-    public function all(array $columns = ['*']): Collection
+    final public function all(array $columns = ['*']): Collection
     {
         return $this->modelClass::all($columns);
     }
 
-    public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
+    final public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
     {
-        return $this->modelClass::paginate($perPage, $columns);
+        return $this->modelClass::query()->paginate($perPage, $columns);
     }
 
-    public function find(int $id, array $columns = ['*']): ?Model
+    final public function find(int $id, array $columns = ['*']): ?Model
     {
-        return $this->modelClass::find($id, $columns);
+        return $this->modelClass::query()->find($id, $columns);
     }
 
-    public function create(array $data): Model
+    final public function create(array $data): Model
     {
-        return $this->modelClass::create($data);
+        return $this->modelClass::query()->create($data);
     }
 
-    public function update(Model $model, array $data): bool
+    final public function update(Model $model, array $data): bool
     {
         return $model->update($data);
     }
 
-    public function delete(Model $model): ?bool
+    final public function delete(Model $model): ?bool
     {
         return $model->delete();
     }

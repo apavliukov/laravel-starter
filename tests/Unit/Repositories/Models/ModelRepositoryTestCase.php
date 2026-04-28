@@ -18,17 +18,17 @@ abstract class ModelRepositoryTestCase extends RepositoryTestCase
     /** @var class-string<Model> */
     protected string $modelClass;
 
-    /**
-     * Get model class
-     */
-    abstract protected function getModelClass(): string;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->modelClass = $this->getModelClass();
     }
+
+    /**
+     * Get model class
+     */
+    abstract protected function getModelClass(): string;
 
     protected function assertModelHasCorrectAttributes(Model $model, array $columns = []): void
     {

@@ -14,6 +14,6 @@ if (! function_exists('get_model_table')) {
             return '';
         }
 
-        return $modelClass::newModelInstance()->getTable();
+        return $modelClass::query()->newModelInstance()->getTable();
     }
 }

@@ -18,7 +18,7 @@ final class ModelRepositoryServiceProvider extends ServiceProvider
         $this->bindModelsRepositories();
     }
 
-    protected function bindModelsRepositories(): void
+    private function bindModelsRepositories(): void
     {
         // Services
         $this->app->when(UserInteractionService::class)

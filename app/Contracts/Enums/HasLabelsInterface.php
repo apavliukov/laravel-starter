@@ -10,12 +10,12 @@ use Illuminate\Contracts\Translation\Translator;
 interface HasLabelsInterface
 {
     /**
-     * @return array<string>|string|Translator|Application|null
-     */
-    public function label(): array|string|Translator|Application|null;
-
-    /**
      * @return array<string>
      */
     public static function getLabels(): array;
+
+    /**
+     * @return array<string>|string|Translator|Application|null
+     */
+    public function label(): array|string|Translator|Application|null;
 }

@@ -15,16 +15,16 @@ use Tests\Generators\Models\BaseModelGenerator;
  */
 final class UserGenerator extends BaseModelGenerator
 {
+    public function createUserCollection(array $data = [], int $count = 2): Collection
+    {
+        return $this->factory->count($count)->create($data);
+    }
+
     /**
      * Get model factory
      */
     protected function getFactory(): Factory
     {
         return User::factory();
-    }
-
-    public function createUserCollection(array $data = [], int $count = 2): Collection
-    {
-        return $this->factory->count($count)->create($data);
     }
 }

@@ -11,15 +11,15 @@ abstract class RepositoryTestCase extends TestCase
 {
     protected BaseRepository $repository;
 
-    /**
-     * Get repository object
-     */
-    abstract protected function getRepository(): BaseRepository;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->repository = $this->getRepository();
     }
+
+    /**
+     * Get repository object
+     */
+    abstract protected function getRepository(): BaseRepository;
 }
