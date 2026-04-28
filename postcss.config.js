@@ -1,4 +1,4 @@
-import { purgeCSSPlugin } from '@fullhuman/postcss-purgecss';
+// import { purgeCSSPlugin } from '@fullhuman/postcss-purgecss';
 import cssnano from 'cssnano';
 
 // eslint-disable-next-line no-undef

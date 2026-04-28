@@ -7,26 +7,25 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "aaronfrancis/airdrop": "^1.0",
         "blade-ui-kit/blade-heroicons": "^2.5",
         "blade-ui-kit/blade-icons": "^1.7",
         "gehrisandro/tailwind-merge-laravel": "^1.2",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^13.0",
         "laravel/horizon": "^5.30",
-        "laravel/tinker": "^2.9",
+        "laravel/tinker": "^3.0.2",
         "livewire/flux": "^2.4",
         "opcodesio/log-viewer": "^3.14",
         "sentry/sentry-laravel": "^4.15"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.14",
         "barryvdh/laravel-ide-helper": "^3.5",
         "dg/bypass-finals": "^1.9",
         "driftingly/rector-laravel": "^2.0",
         "fakerphp/faker": "^1.23",
+        "fruitcake/laravel-debugbar": "^4.2",
         "jasonmccreary/laravel-test-assertions": "^2.6",
         "larastan/larastan": "^3.0",
-        "laravel/boost": "^1.1",
+        "laravel/boost": "^2.4.5",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
@@ -34,7 +33,7 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^12.0",
+        "phpunit/phpunit": "^13.0",
         "rector/rector": "^2.0",
         "roave/security-advisories": "dev-latest",
         "xammie/mailbook": "^1.9"
@@ -58,8 +57,7 @@
         "ide-helper": "@php artisan clear-compiled && php artisan ide-helper:generate && php artisan ide-helper:meta && php artisan ide-helper:models --write-mixin",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi",
-            "@php artisan log-viewer:publish --ansi"
+            "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
