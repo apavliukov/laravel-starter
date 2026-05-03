@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/browser';
 
-const startSentryBrowser = ({ scope: appScope }) => {
+const startSentryBrowser = ({ scope: appScope } = {}) => {
     if (import.meta.env.VITE_APP_ENV !== 'production') {
         return;
     }
@@ -17,7 +17,10 @@ const startSentryBrowser = ({ scope: appScope }) => {
             tracesSampleRate: 1.0,
             sendDefaultPii: true,
         });
-        Sentry.getCurrentScope().setTag('app-scope', appScope);
+
+        if (appScope) {
+            Sentry.getCurrentScope().setTag('app-scope', appScope);
+        }
     });
 };
 

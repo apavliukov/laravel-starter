@@ -1,43 +1,43 @@
-import { Livewire } from '#/../../vendor/livewire/livewire/dist/livewire.esm';
+/**
+ * Alpine component registration for Livewire 4.
+ *
+ * This module does NOT import Livewire - it relies on auto-injection via @fluxScripts.
+ * Components are registered via the 'alpine:init' event which fires before Alpine starts.
+ */
 
 const componentInitQueue = [];
+let initialized = false;
 
-const runComponentInits = () => {
-    if (componentInitQueue.length === 0) {
+const registerQueuedComponents = () => {
+    if (!window.Alpine) {
         return;
     }
 
-    const callback = () => {
-        componentInitQueue.forEach(({ name, component }) => {
-            window.Alpine.data(name, component);
-        });
-    };
-
-    document.addEventListener('alpine:init', callback, { once: true });
-    document.addEventListener('livewire:navigated', callback);
+    componentInitQueue.forEach(({ name, component }) => {
+        window.Alpine.data(name, component);
+    });
 };
 
-const queueComponentInit = (name, component) => {
-    if (typeof component !== 'function') {
+const setupEventListeners = () => {
+    if (initialized) {
         return;
     }
 
-    componentInitQueue.push({ name, component });
-};
+    // Register components when Alpine initializes (before start)
+    document.addEventListener(
+        'alpine:init',
+        () => {
+            registerQueuedComponents();
+        },
+        { once: true },
+    );
 
-export const startAlpine = () => {
-    if (window.alpineStarted) {
-        return;
-    }
+    // Re-register on SPA navigation (components persist but may need re-binding)
+    document.addEventListener('livewire:navigated', () => {
+        registerQueuedComponents();
+    });
 
-    if (typeof window.Livewire !== 'object') {
-        window.Livewire = Livewire;
-    }
-
-    runComponentInits();
-
-    window.Livewire.start();
-    window.alpineStarted = true;
+    initialized = true;
 };
 
 export const initAlpineComponents = (components) => {
@@ -46,6 +46,23 @@ export const initAlpineComponents = (components) => {
     }
 
     Object.entries(components).forEach(([name, component]) => {
-        queueComponentInit(name, component);
+        if (typeof component === 'function') {
+            componentInitQueue.push({ name, component });
+        }
     });
+
+    // If Alpine already exists (e.g., on SPA navigation), register immediately
+    if (window.Alpine) {
+        registerQueuedComponents();
+    }
+};
+
+export const startAlpine = () => {
+    setupEventListeners();
+
+    // If Alpine is already running, just ensure components are registered
+    if (window.Alpine) {
+        registerQueuedComponents();
+    }
+    // Otherwise, auto-injection will start Livewire/Alpine and trigger 'alpine:init'
 };

@@ -10,6 +10,5 @@
 
         @vite(['resources/js/web/web.js'])
         @fluxScripts
-        @livewireScriptConfig
     </body>
 </html>

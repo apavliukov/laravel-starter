@@ -1,11 +1,11 @@
 import '#admin/bootstrap';
 import { startAlpine, initAlpineComponents } from '#common/vendor/alpine';
-import sample from '#common/components/sample';
+import toast from '#admin/components/toast';
 
 class Admin {
     init = () => {
         initAlpineComponents({
-            sample,
+            toast,
         });
 
         startAlpine();

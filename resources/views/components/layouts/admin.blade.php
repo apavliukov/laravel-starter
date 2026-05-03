@@ -10,10 +10,9 @@
             {{ $slot }}
         </flux:main>
 
-        <x-common.ui.toast />
+        <x-admin.ui.toast />
 
         @vite(['resources/js/admin/admin.js'])
         @fluxScripts
-        @livewireScriptConfig
     </body>
 </html>
