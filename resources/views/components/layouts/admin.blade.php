@@ -4,7 +4,7 @@
         @include('partials.head.admin')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <x-common.ui.navigation.layouts.sidebar />
+        <x-admin.ui.navigation.sidebar />
 
         <flux:main>
             {{ $slot }}
