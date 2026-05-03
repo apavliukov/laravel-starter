@@ -1,7 +1,7 @@
 @php
     $role = auth()->user()->app_role;
     $layoutType = $role->layout();
-    $menu = "$layoutType.navigation.menu";
+    $menu = "admin.$layoutType.navigation.menu";
 @endphp
 
 <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">

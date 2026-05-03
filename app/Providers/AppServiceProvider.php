@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\Policies\Ability;
 use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Sentry\EventHint;
@@ -28,11 +31,32 @@ final class AppServiceProvider extends ServiceProvider
         $this->enforceMorphMap();
         $this->enableModelStrictMode();
         $this->registerLogViewerAuth();
+        $this->registerAdminAccessGate();
+        $this->registerCarbonMacros();
+    }
+
+    /**
+     * Admin bypasses via the Gate::before callback below; everyone else
+     * falls through to this `false` and gets 403.
+     *
+     * The ability name reflects the area's purpose — this is the *platform
+     * admin* surface, not the platform itself
+     */
+    private function registerAdminAccessGate(): void
+    {
+        Gate::define(Ability::ACCESS_PLATFORM_ADMIN->value, static fn (): bool => false);
+        Gate::before(static fn(User $user): ?bool => $user->is_admin ? true : null);
+    }
+
+    private function registerCarbonMacros(): void
+    {
+        Date::macro('smartDate', fn (): string => $this->isoFormat($this->isCurrentYear() ? 'D MMMM' : 'D MMMM YYYY'));
+        Date::macro('smartDateTime', fn (): string => $this->isoFormat('D MMMM YYYY HH:mm'));
     }
 
     private function enableModelStrictMode(): void
     {
-        Model::shouldBeStrict(false); // TODO change in next phases of development
+        Model::shouldBeStrict();
 
         if ($this->app->isProduction()) {
             Model::handleLazyLoadingViolationUsing(static function ($model, string $relation): void {
@@ -84,6 +108,6 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerLogViewerAuth(): void
     {
-        LogViewer::auth(static fn (Request $request): bool => ! app()->isProduction() || ($request->user()?->hasVerifiedEmail() ?? false));
+        LogViewer::auth(static fn (Request $request): bool => $request->user()?->is_admin ?? false);
     }
 }

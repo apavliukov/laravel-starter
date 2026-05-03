@@ -78,6 +78,20 @@ final class User extends Authenticatable
         );
     }
 
+    protected function is_admin(): Attribute
+    {
+        return new Attribute(
+            get: fn (): bool => $this->hasRole(RoleEnum::ADMIN),
+        );
+    }
+
+    protected function is_member(): Attribute
+    {
+        return new Attribute(
+            get: fn (): bool => $this->hasRole(RoleEnum::MEMBER),
+        );
+    }
+
     protected function initials(): Attribute
     {
         return new Attribute(

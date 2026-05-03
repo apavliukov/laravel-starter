@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Middleware\EnsurePlatformAdminAccessMiddleware;
 use Illuminate\Support\Facades\Route;
-
-Route::redirect('/', '/admin');
 
 Route::middleware(['auth', 'verified'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
+        Route::get('/', DashboardController::class)
+            ->name('dashboard');
+
         Route::prefix('settings')
             ->name('settings.')
             ->controller(SettingsController::class)
@@ -25,8 +28,8 @@ Route::middleware(['auth', 'verified'])
                     ->name('appearance');
             });
 
-        Route::prefix('platform')
-            ->name('platform.')
+        Route::name('platform.')
+            ->middleware(EnsurePlatformAdminAccessMiddleware::class)
             ->group(base_path('routes/admin/platform.php'));
 
         Route::name('member.')

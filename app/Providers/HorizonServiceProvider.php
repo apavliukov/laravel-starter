@@ -26,6 +26,6 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewHorizon', static fn (User $user): bool => $user->hasVerifiedEmail());
+        Gate::define('viewHorizon', static fn (User $user): bool => $user->is_admin);
     }
 }
