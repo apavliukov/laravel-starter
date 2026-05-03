@@ -1,0 +1,98 @@
+<div class="space-y-6">
+    {{-- Filters --}}
+    <div class="flex flex-wrap items-end gap-4">
+        <flux:field class="w-full sm:w-64">
+            <flux:label>{{ __('Search') }}</flux:label>
+            <flux:input
+                wire:model="search"
+                wire:keydown.enter="$refresh"
+                x-on:search="$wire.$refresh()"
+                size="sm"
+                type="search"
+                :placeholder="__('Search users...')"
+                icon="magnifying-glass"
+            />
+        </flux:field>
+
+        @if ($search)
+            <flux:button wire:click="clearFilters" variant="filled" size="sm" icon="x-mark">
+                {{ __('Clear Filters') }}
+            </flux:button>
+        @endif
+    </div>
+
+    {{-- Empty state / Table --}}
+    @if ($this->users->isEmpty())
+        <div class="rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
+            <flux:icon.users class="mx-auto h-12 w-12 text-zinc-400" />
+            <flux:heading size="sm" class="mt-2">{{ __('No users found') }}</flux:heading>
+            <flux:text class="mt-1 text-zinc-500">{{ __('No users match your current filters.') }}</flux:text>
+        </div>
+    @else
+        <div class="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+            <div class="overflow-x-auto">
+                <table class="w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                    <thead class="bg-neutral-50 dark:bg-neutral-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 dark:text-neutral-400">
+                                <button wire:click="sortBy('name')"
+                                        class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200">
+                                    {{ __('Name') }}
+                                    @if ($sort === 'name')
+                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'" class="size-3" />
+                                    @endif
+                                </button>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                                {{ __('Role') }}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 dark:text-neutral-400">
+                                <button wire:click="sortBy('created_at')"
+                                        class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200">
+                                    {{ __('Registered') }}
+                                    @if ($sort === 'created_at')
+                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'" class="size-3" />
+                                    @endif
+                                </button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
+                        @foreach ($this->users as $user)
+                            <tr wire:key="user-{{ $user->id }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                                            {{ $user->name() }}
+                                        </div>
+                                        <div class="text-xs text-neutral-500 dark:text-neutral-400">
+                                            {{ $user->email }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if ($user->roleCache)
+                                        <flux:badge :color="$user->roleCache->badgeColor()" size="sm">
+                                            {{ $user->roleCache->label() }}
+                                        </flux:badge>
+                                    @else
+                                        <flux:text class="text-sm">—</flux:text>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4">
+                                    <flux:text class="text-sm" title="{{ $user->created_at->smartDateTime() }}">
+                                        {{ $user->created_at->smartDate() }}
+                                    </flux:text>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if ($this->users->hasPages())
+            <div class="mt-4">{{ $this->users->links() }}</div>
+        @endif
+    @endif
+</div>
