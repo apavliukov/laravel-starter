@@ -19,6 +19,7 @@ return new class extends Migration
             $blueprint->string('password');
             $blueprint->rememberToken();
             $blueprint->timestamps();
+            $blueprint->softDeletes();
         });
 
         Schema::create('password_reset_tokens', static function (Blueprint $blueprint): void {
