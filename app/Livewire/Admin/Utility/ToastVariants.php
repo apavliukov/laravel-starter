@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Common\Utility;
+namespace App\Livewire\Admin\Utility;
 
 use Illuminate\View\View;
 use Livewire\Component;
@@ -36,6 +36,6 @@ final class ToastVariants extends Component
 
     public function render(): View
     {
-        return view('livewire.common.utility.toast-variants');
+        return view('livewire.admin.utility.toast-variants');
     }
 }

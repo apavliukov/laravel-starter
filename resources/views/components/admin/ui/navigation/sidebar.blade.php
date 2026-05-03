@@ -15,5 +15,5 @@
 
     <flux:spacer />
 
-    <x-common.ui.navigation.user-menu />
+    <x-admin.ui.navigation.user-menu />
 </flux:sidebar>
