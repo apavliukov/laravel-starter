@@ -1,3 +1,3 @@
 <x-layouts.admin :title="__('Settings - Appearance')">
-    <livewire:admin.common.settings.appearance />
+    <livewire:admin.settings.appearance />
 </x-layouts.admin>

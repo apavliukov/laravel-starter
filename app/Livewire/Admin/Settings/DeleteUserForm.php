@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Admin\Common\Settings;
+namespace App\Livewire\Admin\Settings;
 
 use App\Livewire\Auth\Actions\Logout;
 use Illuminate\Contracts\View\View;
@@ -26,6 +26,6 @@ final class DeleteUserForm extends Component
 
     public function render(): View
     {
-        return view('livewire.admin.common.settings.delete-user-form');
+        return view('livewire.admin.settings.delete-user-form');
     }
 }

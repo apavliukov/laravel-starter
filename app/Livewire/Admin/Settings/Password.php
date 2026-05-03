@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Admin\Common\Settings;
+namespace App\Livewire\Admin\Settings;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +43,6 @@ final class Password extends Component
 
     public function render(): View
     {
-        return view('livewire.admin.common.settings.password');
+        return view('livewire.admin.settings.password');
     }
 }

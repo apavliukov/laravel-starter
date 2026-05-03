@@ -1,4 +1,4 @@
-<x-common.modules.settings.layout
+<x-admin.settings.layout
     :tab-heading="__('Update password')"
     :tab-subheading="__('Ensure your account is using a long, random password to stay secure')"
 >
@@ -35,4 +35,4 @@
             </x-action-message>
         </div>
     </form>
-</x-common.modules.settings.layout>
+</x-admin.settings.layout>

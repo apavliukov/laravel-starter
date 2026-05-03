@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Admin\Common\Settings;
+namespace App\Livewire\Admin\Settings;
 
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -76,6 +76,6 @@ final class Profile extends Component
 
     public function render(): View
     {
-        return view('livewire.admin.common.settings.profile');
+        return view('livewire.admin.settings.profile');
     }
 }

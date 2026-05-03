@@ -1,4 +1,4 @@
-<x-common.modules.settings.layout
+<x-admin.settings.layout
     :tab-heading="__('Profile')"
     :tab-subheading="__('Update your name and email address')"
 >
@@ -38,5 +38,5 @@
         </div>
     </form>
 
-    <livewire:admin.common.settings.delete-user-form />
-</x-common.modules.settings.layout>
+    <livewire:admin.settings.delete-user-form />
+</x-admin.settings.layout>

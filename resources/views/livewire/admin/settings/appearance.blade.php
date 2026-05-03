@@ -1,4 +1,4 @@
-<x-common.modules.settings.layout
+<x-admin.settings.layout
     :tab-heading="__('Appearance')"
     :tab-subheading="__('Update the appearance settings for your account')"
 >
@@ -7,4 +7,4 @@
         <flux:radio value="dark" icon="moon">{{ __('Dark') }}</flux:radio>
         <flux:radio value="system" icon="computer-desktop">{{ __('System') }}</flux:radio>
     </flux:radio.group>
-</x-common.modules.settings.layout>
+</x-admin.settings.layout>
