@@ -1,4 +1,4 @@
-@use(App\Enums\Policies\Ability)
+@use(App\Enums\Policies\Abilities\Ability)
 @use(App\Models\User)
 
 @php /** @var User $user */ @endphp
@@ -14,14 +14,14 @@
 <x-admin.ui.layouts.main :$mainHeading :$tabHeading :$tabSubheading>
     <x-slot:headerButtons>
         @isset($user)
-            @can(Ability::UPDATE->value, $user)
+            @can(Ability::UPDATE, $user)
                 <flux:button variant="primary" size="sm" icon="pencil"
                     :href="route('admin.platform.users.edit', $user)" wire:navigate>
                     {{ __('Edit') }}
                 </flux:button>
             @endcan
         @else
-            @can(Ability::CREATE->value, User::class)
+            @can(Ability::CREATE, User::class)
                 <flux:button variant="primary" size="sm" icon="plus"
                     :href="route('admin.platform.users.create')" wire:navigate>
                     {{ __('Add User') }}

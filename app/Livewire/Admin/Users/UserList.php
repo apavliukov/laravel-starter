@@ -21,8 +21,10 @@ final class UserList extends Component
     #[Url]
     public string $search = '';
 
+    #[Url(except: 'created_at')]
     public string $sort = 'created_at';
 
+    #[Url(except: 'desc')]
     public string $direction = 'desc';
 
     public function updatedSearch(): void

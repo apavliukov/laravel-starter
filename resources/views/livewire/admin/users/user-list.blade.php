@@ -1,3 +1,4 @@
+@php use App\Enums\Policies\Abilities\Ability; @endphp
 <div class="space-y-6">
     {{-- Filters --}}
     <div class="flex flex-wrap items-end gap-4">
@@ -23,8 +24,9 @@
 
     {{-- Empty state / Table --}}
     @if ($this->users->isEmpty())
-        <div class="rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.users class="mx-auto h-12 w-12 text-zinc-400" />
+        <div
+            class="rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
+            <flux:icon.users class="mx-auto h-12 w-12 text-zinc-400"/>
             <flux:heading size="sm" class="mt-2">{{ __('No users found') }}</flux:heading>
             <flux:text class="mt-1 text-zinc-500">{{ __('No users match your current filters.') }}</flux:text>
         </div>
@@ -39,7 +41,8 @@
                                         class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200">
                                     {{ __('Name') }}
                                     @if ($sort === 'name')
-                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'" class="size-3" />
+                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'"
+                                                   class="size-3"/>
                                     @endif
                                 </button>
                             </th>
@@ -51,7 +54,8 @@
                                         class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200">
                                     {{ __('Registered') }}
                                     @if ($sort === 'created_at')
-                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'" class="size-3" />
+                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'"
+                                                   class="size-3"/>
                                     @endif
                                 </button>
                             </th>
@@ -85,13 +89,13 @@
                                     </flux:text>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    @can(\App\Enums\Policies\Ability::UPDATE->value, $user)
+                                    @can(Ability::UPDATE, $user)
                                         <flux:button size="sm" variant="ghost" icon="pencil"
-                                            :href="route('admin.platform.users.edit', $user)" wire:navigate>
+                                                     :href="route('admin.platform.users.edit', $user)" wire:navigate>
                                             {{ __('Edit') }}
                                         </flux:button>
                                     @endcan
-                                    @can(\App\Enums\Policies\Ability::DELETE->value, $user)
+                                    @can(Ability::DELETE, $user)
                                         <flux:modal.trigger :name="'delete-user-'.$user->id">
                                             <flux:button size="sm" variant="ghost" icon="trash">
                                                 {{ __('Delete') }}
@@ -100,7 +104,7 @@
                                         <livewire:admin.users.delete-user
                                             :user="$user"
                                             :modal-name="'delete-user-'.$user->id"
-                                            wire:key="delete-user-{{ $user->id }}" />
+                                            wire:key="delete-user-{{ $user->id }}"/>
                                     @endcan
                                 </td>
                             </tr>

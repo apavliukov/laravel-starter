@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Users;
 
 use App\Actions\Users\DeleteUser as DeleteUserAction;
-use App\Enums\Policies\Ability;
+use App\Enums\Policies\Abilities\Ability;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;

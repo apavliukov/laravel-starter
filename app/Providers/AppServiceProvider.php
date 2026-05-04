@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Enums\Policies\Ability;
+use App\Enums\Policies\Abilities\SystemAbility;
 use App\Models\Permission;
 use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
@@ -45,8 +45,8 @@ final class AppServiceProvider extends ServiceProvider
      */
     private function registerAdminAccessGate(): void
     {
-        Gate::define(Ability::ACCESS_PLATFORM_ADMIN->value, static fn (): bool => false);
-        Gate::before(static fn(User $user): ?bool => $user->is_admin ? true : null);
+        Gate::define(SystemAbility::ACCESS_PLATFORM_ADMIN, static fn (): bool => false);
+        Gate::before(static fn (User $user): ?bool => $user->is_admin ? true : null);
     }
 
     private function registerCarbonMacros(): void
@@ -110,6 +110,6 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerLogViewerAuth(): void
     {
-        LogViewer::auth(static fn (Request $request): bool => $request->user()?->is_admin ?? false);
+        LogViewer::auth(static fn (Request $request): bool => (bool) $request->user()?->can(SystemAbility::ACCESS_PLATFORM_ADMIN));
     }
 }
