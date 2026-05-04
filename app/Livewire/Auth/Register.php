@@ -15,7 +15,9 @@ use Livewire\Component;
 #[Layout('components.layouts.auth')]
 final class Register extends Component
 {
-    public string $name = '';
+    public string $first_name = '';
+
+    public string $last_name = '';
 
     public string $email = '';
 
@@ -23,23 +25,24 @@ final class Register extends Component
 
     public string $password_confirmation = '';
 
-    /**
-     * Handle an incoming registration request.
-     */
     public function register(): void
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'confirmed', Password::defaults()],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        event(new Registered(($user = User::query()->create($validated))));
+        /** @var User $user */
+        $user = User::query()->create($validated);
+
+        event(new Registered($user));
 
         Auth::login($user);
 
-        $this->redirect(route('admin.member.dashboard', absolute: false), navigate: true);
+        $this->redirect(route('admin.dashboard'), navigate: true);
     }
 }

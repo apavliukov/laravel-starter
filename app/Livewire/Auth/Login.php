@@ -23,8 +23,6 @@ final class Login extends Component
     #[Validate('required|string')]
     public string $password = '';
 
-    public bool $remember = false;
-
     /**
      * Handle an incoming authentication request.
      */
@@ -34,7 +32,7 @@ final class Login extends Component
 
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], true)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -45,7 +43,7 @@ final class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('admin.member.dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
     }
 
     /**

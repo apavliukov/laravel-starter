@@ -35,6 +35,6 @@ final class ConfirmPassword extends Component
 
         session(['auth.password_confirmed_at' => Date::now()->getTimestamp()]);
 
-        $this->redirectIntended(default: route('admin.member.dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
     }
 }
