@@ -55,6 +55,9 @@
                                     @endif
                                 </button>
                             </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                                {{ __('Actions') }}
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
@@ -62,27 +65,43 @@
                             <tr wire:key="user-{{ $user->id }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                 <td class="px-6 py-4">
                                     <div>
-                                        <div class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                                            {{ $user->name() }}
-                                        </div>
+                                        <a href="{{ route('admin.platform.users.edit', $user) }}" wire:navigate
+                                           class="text-sm font-medium text-neutral-900 hover:underline dark:text-neutral-100">
+                                            {{ $user->name }}
+                                        </a>
                                         <div class="text-xs text-neutral-500 dark:text-neutral-400">
                                             {{ $user->email }}
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if ($user->roleCache)
-                                        <flux:badge :color="$user->roleCache->badgeColor()" size="sm">
-                                            {{ $user->roleCache->label() }}
-                                        </flux:badge>
-                                    @else
-                                        <flux:text class="text-sm">—</flux:text>
-                                    @endif
+                                    <flux:badge :color="$user->appRole->badgeColor()" size="sm">
+                                        {{ $user->appRole->label() }}
+                                    </flux:badge>
                                 </td>
                                 <td class="px-6 py-4">
                                     <flux:text class="text-sm" title="{{ $user->created_at->smartDateTime() }}">
                                         {{ $user->created_at->smartDate() }}
                                     </flux:text>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    @can(\App\Enums\Policies\Ability::UPDATE->value, $user)
+                                        <flux:button size="sm" variant="ghost" icon="pencil"
+                                            :href="route('admin.platform.users.edit', $user)" wire:navigate>
+                                            {{ __('Edit') }}
+                                        </flux:button>
+                                    @endcan
+                                    @can(\App\Enums\Policies\Ability::DELETE->value, $user)
+                                        <flux:modal.trigger :name="'delete-user-'.$user->id">
+                                            <flux:button size="sm" variant="ghost" icon="trash">
+                                                {{ __('Delete') }}
+                                            </flux:button>
+                                        </flux:modal.trigger>
+                                        <livewire:admin.users.delete-user
+                                            :user="$user"
+                                            :modal-name="'delete-user-'.$user->id"
+                                            wire:key="delete-user-{{ $user->id }}" />
+                                    @endcan
                                 </td>
                             </tr>
                         @endforeach

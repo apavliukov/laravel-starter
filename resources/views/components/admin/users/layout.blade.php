@@ -1,4 +1,7 @@
-@php /** @var \App\Models\User $user */ @endphp
+@use(App\Enums\Policies\Ability)
+@use(App\Models\User)
+
+@php /** @var User $user */ @endphp
 
 @props([
     'mainHeading' => isset($user) ? $user->name : null,
@@ -10,13 +13,30 @@
 
 <x-admin.ui.layouts.main :$mainHeading :$tabHeading :$tabSubheading>
     <x-slot:headerButtons>
-        {{-- TODO Future button to create a user --}}
+        @isset($user)
+            @can(Ability::UPDATE->value, $user)
+                <flux:button variant="primary" size="sm" icon="pencil"
+                    :href="route('admin.platform.users.edit', $user)" wire:navigate>
+                    {{ __('Edit') }}
+                </flux:button>
+            @endcan
+        @else
+            @can(Ability::CREATE->value, User::class)
+                <flux:button variant="primary" size="sm" icon="plus"
+                    :href="route('admin.platform.users.create')" wire:navigate>
+                    {{ __('Add User') }}
+                </flux:button>
+            @endcan
+        @endisset
     </x-slot:headerButtons>
 
     @if($hasTabs)
         <x-slot:tabs>
             <flux:navlist>
-                {{-- TODO Future routes: edit, etc. --}}
+                <flux:navlist.item :href="route('admin.platform.users.edit', $user)"
+                    icon="pencil" wire:navigate>
+                    {{ __('Edit') }}
+                </flux:navlist.item>
             </flux:navlist>
         </x-slot:tabs>
     @endif

@@ -11,4 +11,8 @@ Route::prefix('users')
     ->group(function (): void {
         Route::get('/', 'index')
             ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::get('/{user}/edit', 'edit')
+            ->name('edit');
     });

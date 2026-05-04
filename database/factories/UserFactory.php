@@ -27,18 +27,12 @@ final class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
-            'is_active' => true,
         ];
     }
 
     public function unverified(): self
     {
         return $this->state(fn (): array => ['email_verified_at' => null]);
-    }
-
-    public function inactive(): self
-    {
-        return $this->state(fn (): array => ['is_active' => false]);
     }
 
     public function withRole(RoleEnum $role): self

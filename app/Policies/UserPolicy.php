@@ -17,10 +17,7 @@ final readonly class UserPolicy extends AbstractPolicy implements PolicySoftDele
      */
     public function viewAny(User $user): bool
     {
-        return match ($user->app_role) {
-            Role::SUPER_ADMIN, Role::ADMIN, Role::TEAM_LEAD => true,
-            default => false,
-        };
+        return $user->app_role === Role::ADMIN;
     }
 
     /**

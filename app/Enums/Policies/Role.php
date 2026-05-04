@@ -47,4 +47,12 @@ enum Role: string implements HasLabelsInterface, StringMatchInterface
             self::MEMBER => 'member',
         };
     }
+
+    public function badgeColor(): string
+    {
+        return match ($this) {
+            self::ADMIN => 'red',
+            self::MEMBER => 'zinc',
+        };
+    }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\Media;
 use App\Models\Role;
 use App\Models\User;
 
@@ -21,12 +20,11 @@ abstract readonly class Permissions
     final public static function getAllPermissions(): array
     {
         return array_merge(
-            Media::makeAllPermissions(),
             User::makeAllPermissions(),
         );
     }
 
-    final public static function getCandidatePermissions(): array
+    final public static function getMemberPermissions(): array
     {
         return [];
     }

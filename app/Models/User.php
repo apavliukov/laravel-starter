@@ -11,6 +11,7 @@ use App\Traits\Models\HasRelationTypeName;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,6 +42,26 @@ final class User extends Authenticatable
     use HasRoles;
     use Notifiable;
     use SoftDeletes;
+
+    public function scopeSearch(Builder $query, string $term): void
+    {
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%'.$term.'%';
+
+        $query->where(function (Builder $q) use ($like): void {
+            $q->where('first_name', 'ilike', $like)
+                ->orWhere('last_name', 'ilike', $like)
+                ->orWhere('email', 'ilike', $like);
+        });
+    }
+
+    public function scopeWithRole(Builder $query, RoleEnum $role): void
+    {
+        $query->whereHas('roles', fn (Builder $q) => $q->where('name', $role->value));
+    }
 
     protected function casts(): array
     {
@@ -80,14 +101,14 @@ final class User extends Authenticatable
         );
     }
 
-    protected function is_admin(): Attribute
+    protected function isAdmin(): Attribute
     {
         return new Attribute(
             get: fn (): bool => $this->hasRole(RoleEnum::ADMIN),
         );
     }
 
-    protected function is_member(): Attribute
+    protected function isMember(): Attribute
     {
         return new Attribute(
             get: fn (): bool => $this->hasRole(RoleEnum::MEMBER),

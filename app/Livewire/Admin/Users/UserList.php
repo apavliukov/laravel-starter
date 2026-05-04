@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Users;
 
+use App\DTO\Users\ListUsersFilters;
 use App\Models\User;
+use App\Queries\Users\ListUsersQuery;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -25,11 +26,6 @@ final class UserList extends Component
     public string $direction = 'desc';
 
     public function updatedSearch(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedActiveFilter(): void
     {
         $this->resetPage();
     }
@@ -61,28 +57,11 @@ final class UserList extends Component
     #[Computed]
     public function users(): LengthAwarePaginator
     {
-        $query = User::query()
-            ->when(
-                $this->search !== '',
-                function (Builder $q): void {
-                    $term = '%'.$this->search.'%';
-
-                    $q->where(function (Builder $q) use ($term): void {
-                        $q->where('first_name', 'ilike', $term)
-                            ->orWhere('last_name', 'ilike', $term)
-                            ->orWhere('email', 'ilike', $term);
-                    });
-                }
-            );
-
-        if ($this->sort === 'name') {
-            $query->orderBy('first_name', $this->direction)
-                ->orderBy('last_name', $this->direction);
-        } else {
-            $query->orderBy($this->sort, $this->direction);
-        }
-
-        return $query->paginate(15);
+        return new ListUsersQuery()->handle(new ListUsersFilters(
+            search: $this->search,
+            sort: $this->sort,
+            direction: $this->direction,
+        ));
     }
 
     public function render(): View
