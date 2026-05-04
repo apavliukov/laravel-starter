@@ -31,6 +31,38 @@ The base `tests/TestCase.php` already includes `RefreshDatabase`, `AdditionalAss
 - Every time a test is updated, run that singular test immediately.
 - When the tests relating to your feature are passing, ask the user if they would like to also run the entire test suite to make sure everything is still passing.
 
+## PHPUnit Attributes
+
+Always add `#[Group]` and `#[CoversClass]` at the class level. Import from `PHPUnit\Framework\Attributes\`.
+
+**`#[Group]`** — enables targeted runs (`vendor/bin/sail artisan test --group=livewire`). Use one group per dimension:
+
+| Group | When to use |
+|-------|-------------|
+| `actions` | Unit tests for Action classes |
+| `queries` | Unit tests for Query classes |
+| `policies` | Unit tests for Policy classes |
+| `dto` | Unit tests for DTO classes |
+| `scopes` | Unit tests for model scopes |
+| `livewire` | Feature tests using `Livewire::test()` |
+| `admin` | Feature tests in the admin/platform area |
+| `web` | Feature tests for public-facing web routes |
+| `api` | Feature tests for API routes |
+| `users` | Any test scoped to the User model/domain |
+
+A test class typically has two groups: a type group (`actions`, `livewire`, etc.) and a domain group (`users`, etc.).
+
+**`#[CoversClass(ClassName::class)]`** — declares the primary class under test. Required on every test class for accurate coverage reports.
+
+**`#[DataProvider('methodName')]`** — use for parameterized tests instead of duplicating test methods. The provider method must be `public static` and return an iterable.
+
+```php
+#[Group('actions')]
+#[Group('users')]
+#[CoversClass(CreateUser::class)]
+final class CreateUserTest extends TestCase { ... }
+```
+
 ## Test Quality
 
 - Unit and feature tests are more important than verification scripts.

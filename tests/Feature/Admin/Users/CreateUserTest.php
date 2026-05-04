@@ -9,9 +9,15 @@ use App\Livewire\Admin\Users\CreateUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[Group('admin')]
+#[Group('users')]
+#[Group('livewire')]
+#[CoversClass(CreateUser::class)]
 final class CreateUserTest extends TestCase
 {
     #[Test]

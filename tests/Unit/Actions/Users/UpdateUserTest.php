@@ -9,11 +9,25 @@ use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[Group('actions')]
+#[Group('users')]
+#[CoversClass(UpdateUser::class)]
 final class UpdateUserTest extends TestCase
 {
+    private UpdateUser $action;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->action = $this->app->make(UpdateUser::class);
+    }
+
     #[Test]
     public function updates_fields_and_role_and_rehashes_password_when_provided(): void
     {
@@ -23,9 +37,8 @@ final class UpdateUserTest extends TestCase
             'email' => 'old@example.test',
         ]);
         $originalHash = $user->password;
-        $action = $this->app->make(UpdateUser::class);
 
-        $updated = $action($user, new UpdateUserInput(
+        $updated = ($this->action)($user, new UpdateUserInput(
             firstName: 'New',
             lastName: 'Name',
             email: 'new@example.test',
@@ -45,9 +58,8 @@ final class UpdateUserTest extends TestCase
     {
         $user = User::factory()->member()->create();
         $originalHash = $user->password;
-        $action = $this->app->make(UpdateUser::class);
 
-        $updated = $action($user, new UpdateUserInput(
+        $updated = ($this->action)($user, new UpdateUserInput(
             firstName: $user->first_name,
             lastName: $user->last_name,
             email: $user->email,
@@ -62,9 +74,8 @@ final class UpdateUserTest extends TestCase
     public function does_not_resync_roles_when_role_unchanged(): void
     {
         $user = User::factory()->member()->create();
-        $action = $this->app->make(UpdateUser::class);
 
-        $updated = $action($user, new UpdateUserInput(
+        $updated = ($this->action)($user, new UpdateUserInput(
             firstName: $user->first_name,
             lastName: $user->last_name,
             email: $user->email,

@@ -6,10 +6,15 @@ namespace Tests\Unit\Dto\Users;
 
 use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Role;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use ValueError;
 
+#[Group('dto')]
+#[Group('users')]
+#[CoversClass(CreateUserInput::class)]
 final class CreateUserInputTest extends TestCase
 {
     #[Test]

@@ -8,17 +8,31 @@ use App\Dto\Users\ListUsersFilters;
 use App\Models\User;
 use App\Queries\Users\ListUsersQuery;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[Group('queries')]
+#[Group('users')]
+#[CoversClass(ListUsersQuery::class)]
 final class ListUsersQueryTest extends TestCase
 {
+    private ListUsersQuery $query;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->query = new ListUsersQuery();
+    }
+
     #[Test]
     public function returns_paginator_of_all_users_when_filters_are_default(): void
     {
         User::factory()->count(3)->create();
 
-        $result = (new ListUsersQuery())->handle(new ListUsersFilters());
+        $result = $this->query->handle(new ListUsersFilters());
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertSame(3, $result->total());
@@ -30,7 +44,7 @@ final class ListUsersQueryTest extends TestCase
         User::factory()->create(['first_name' => 'Alice']);
         User::factory()->create(['first_name' => 'Bob']);
 
-        $result = (new ListUsersQuery())->handle(new ListUsersFilters(search: 'alice'));
+        $result = $this->query->handle(new ListUsersFilters(search: 'alice'));
 
         $this->assertSame(1, $result->total());
     }
@@ -42,7 +56,7 @@ final class ListUsersQueryTest extends TestCase
         User::factory()->create(['first_name' => 'Alice', 'last_name' => 'A']);
         User::factory()->create(['first_name' => 'Bob', 'last_name' => 'B']);
 
-        $result = (new ListUsersQuery())->handle(new ListUsersFilters(sort: 'name', direction: 'asc'));
+        $result = $this->query->handle(new ListUsersFilters(sort: 'name', direction: 'asc'));
 
         $names = $result->getCollection()->map(fn (User $u): string => $u->first_name)->all();
         $this->assertSame(['Alice', 'Bob', 'Charlie'], $names);
@@ -53,7 +67,7 @@ final class ListUsersQueryTest extends TestCase
     {
         User::factory()->count(20)->create();
 
-        $result = (new ListUsersQuery())->handle(new ListUsersFilters(perPage: 5));
+        $result = $this->query->handle(new ListUsersFilters(perPage: 5));
 
         $this->assertSame(5, $result->perPage());
         $this->assertSame(20, $result->total());

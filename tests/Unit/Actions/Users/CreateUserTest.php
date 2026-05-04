@@ -9,9 +9,14 @@ use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[Group('actions')]
+#[Group('users')]
+#[CoversClass(CreateUser::class)]
 final class CreateUserTest extends TestCase
 {
     #[Test]

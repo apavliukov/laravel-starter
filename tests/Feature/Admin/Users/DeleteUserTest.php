@@ -7,9 +7,15 @@ namespace Tests\Feature\Admin\Users;
 use App\Livewire\Admin\Users\DeleteUser;
 use App\Models\User;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[Group('admin')]
+#[Group('users')]
+#[Group('livewire')]
+#[CoversClass(DeleteUser::class)]
 final class DeleteUserTest extends TestCase
 {
     #[Test]

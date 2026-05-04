@@ -6,9 +6,14 @@ namespace Tests\Unit\Models;
 
 use App\Enums\Policies\Role;
 use App\Models\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[Group('scopes')]
+#[Group('users')]
+#[CoversClass(User::class)]
 final class UserScopesTest extends TestCase
 {
     #[Test]
