@@ -1,8 +1,8 @@
 <flux:navlist variant="outline">
     <flux:navlist.group :heading="__('Member')" class="grid">
-        <flux:navlist.item icon="arrow-up-tray"
-                           :href="route('admin.member.dashboard')"
-                           :current="request()->is('admin.member.dashboard')"
+        <flux:navlist.item icon="home"
+                           :href="route('admin.dashboard')"
+                           :current="request()->routeIs('admin.dashboard')"
                            wire:navigate
         >
             {{ __('Member Dashboard') }}

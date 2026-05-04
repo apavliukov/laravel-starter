@@ -64,7 +64,7 @@ final class Profile extends Component
         }
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('admin.member.dashboard', absolute: false));
+            $this->redirectIntended(default: route('admin.dashboard', absolute: false));
 
             return;
         }
