@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\Policies\Abilities\Ability;
+use App\Models\Permission;
 use App\Models\User;
-use App\Traits\Policies\HasAuthorizationActions;
+use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
 
 abstract readonly class AbstractPolicy
 {
-    use HasAuthorizationActions;
-
     protected string $modelClass;
 
     public function __construct()
@@ -55,5 +54,12 @@ abstract readonly class AbstractPolicy
     public function forceDelete(User $user, Model $model): bool
     {
         return $this->userCan($user, Ability::FORCE_DELETE, $model);
+    }
+
+    protected function userCan(User $user, BackedEnum $ability, Model|string|null $model = null): bool
+    {
+        $modelToCheck = $model ?? $this->modelClass;
+
+        return $user->can(Permission::makeNameFromAbility($ability, $modelToCheck));
     }
 }
