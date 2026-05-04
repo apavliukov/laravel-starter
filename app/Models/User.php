@@ -11,6 +11,7 @@ use App\Traits\Models\HasRelationTypeName;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,7 +44,8 @@ final class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
-    public function scopeSearch(Builder $query, string $term): void
+    #[Scope]
+    protected function search(Builder $query, string $term): void
     {
         if ($term === '') {
             return;
@@ -58,7 +60,8 @@ final class User extends Authenticatable
         });
     }
 
-    public function scopeWithRole(Builder $query, RoleEnum $role): void
+    #[Scope]
+    protected function withRole(Builder $query, RoleEnum $role): void
     {
         $query->whereHas('roles', fn (Builder $q) => $q->where('name', $role->value));
     }

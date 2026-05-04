@@ -49,7 +49,7 @@ trait HasPolicy
         $abilities = array_merge(static::getBasicAbilities(), static::getCustomAbilities());
 
         return array_map(
-            static fn (BackedEnum $ability) => static::makeModelPermission($ability),
+            static::makeModelPermission(...),
             $abilities,
         );
     }

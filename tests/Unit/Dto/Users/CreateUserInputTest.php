@@ -8,6 +8,7 @@ use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Role;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use ValueError;
 
 final class CreateUserInputTest extends TestCase
 {
@@ -32,7 +33,7 @@ final class CreateUserInputTest extends TestCase
     #[Test]
     public function from_array_throws_on_unknown_role(): void
     {
-        $this->expectException(\ValueError::class);
+        $this->expectException(ValueError::class);
 
         CreateUserInput::fromArray([
             'first_name' => 'A',
