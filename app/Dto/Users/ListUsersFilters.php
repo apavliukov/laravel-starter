@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DTO\Users;
+namespace App\Dto\Users;
 
 final readonly class ListUsersFilters
 {

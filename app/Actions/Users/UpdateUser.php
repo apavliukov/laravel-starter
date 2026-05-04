@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Users;
 
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\DB;

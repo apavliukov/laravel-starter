@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Actions\Users;
 
 use App\Actions\Users\CreateUser;
-use App\DTO\Users\CreateUserInput;
+use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;

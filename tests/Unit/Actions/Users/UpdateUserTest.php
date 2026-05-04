@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Actions\Users;
 
 use App\Actions\Users\UpdateUser;
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;

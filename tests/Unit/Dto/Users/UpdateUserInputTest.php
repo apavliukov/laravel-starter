@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\DTO\Users;
+namespace Tests\Unit\Dto\Users;
 
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Role;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

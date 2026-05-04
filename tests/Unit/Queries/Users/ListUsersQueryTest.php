@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Queries\Users;
 
-use App\DTO\Users\ListUsersFilters;
+use App\Dto\Users\ListUsersFilters;
 use App\Models\User;
 use App\Queries\Users\ListUsersQuery;
 use Illuminate\Pagination\LengthAwarePaginator;

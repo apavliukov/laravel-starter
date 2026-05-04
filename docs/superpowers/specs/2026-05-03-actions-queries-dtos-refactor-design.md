@@ -31,7 +31,7 @@ Livewire / Controller
 - **Actions** (`app/Actions/Users/`) — one class per write use case. Single `__invoke`. Receive a validated input DTO, perform the operation (including side effects like role sync), return the resulting model.
 - **Query objects** (`app/Queries/Users/`) — one class per read use case. `handle(FiltersDTO)` returns an Eloquent paginator/collection. Compose model scopes.
 - **Eloquent scopes** on the model — small reusable predicates (e.g. `scopeSearch`, `scopeWithRole`).
-- **DTOs** (`app/DTO/Users/`) — hand-rolled `final readonly` classes; **all DTOs live in this directory**, regardless of whether they have one consumer or many. Same convention as Form Requests and Controllers.
+- **DTOs** (`app/Dto/Users/`) — hand-rolled `final readonly` classes; **all DTOs live in this directory**, regardless of whether they have one consumer or many. Same convention as Form Requests and Controllers.
 - **Livewire components** are the HTTP boundary: validate via their own `rules()`, build the input DTO, invoke the action, then redirect/toast. They contain no business logic and do not call Eloquent for writes.
 - **Page controllers** stay thin: `Gate::authorize()` plus `view(...)`. No data loading.
 
@@ -45,7 +45,7 @@ Validation lives in the Livewire component (Livewire is the entry boundary here,
 | 2 | CRUD scope | Fillable fields (`first_name`, `last_name`, `email`, `password`) **plus** role selection on create and edit. |
 | 3 | Component location | Flat `App\Livewire\Admin\Users\` (no `Member/` or `Platform/` segment). The current admin-structure rule will be revised in a follow-up to allow flat namespacing for shared resources. |
 | 4 | Route name | `admin.platform.users.*`, URL `/admin/users` (already in `routes/admin/platform.php` behind `EnsurePlatformAdminAccessMiddleware`). |
-| 5 | DTO placement | All DTOs in `app/DTO/Users/`, mirroring the Form Request / Controller convention. |
+| 5 | DTO placement | All DTOs in `app/Dto/Users/`, mirroring the Form Request / Controller convention. |
 | 6 | List query return type | `LengthAwarePaginator<int, User>` — Eloquent paginator. The list view reads model accessors (`name`, `initials`, `is_admin`); a list-row DTO would cost ergonomics with no boundary win. |
 
 ## Directory Layout
@@ -58,7 +58,7 @@ app/
 │   └── DeleteUser.php           # __invoke(User): void
 ├── Queries/Users/
 │   └── ListUsersQuery.php       # handle(ListUsersFilters): LengthAwarePaginator<int, User>
-├── DTO/Users/
+├── Dto/Users/
 │   ├── CreateUserInput.php
 │   ├── UpdateUserInput.php
 │   └── ListUsersFilters.php
@@ -90,7 +90,7 @@ routes/admin/platform.php        # extend existing users group with create + edi
 
 ## DTOs
 
-All `final readonly`, in `app/DTO/Users/`. Validation rules + messages stay in the Livewire components; DTOs only carry data.
+All `final readonly`, in `app/Dto/Users/`. Validation rules + messages stay in the Livewire components; DTOs only carry data.
 
 ```php
 // CreateUserInput.php

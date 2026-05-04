@@ -316,14 +316,14 @@ This DTO is a plain readonly value with all-default-able properties. There is no
 
 - [ ] **Step 4.1: Create the DTO**
 
-Create `app/DTO/Users/ListUsersFilters.php`:
+Create `app/Dto/Users/ListUsersFilters.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace App\DTO\Users;
+namespace App\Dto\Users;
 
 final readonly class ListUsersFilters
 {
@@ -339,7 +339,7 @@ final readonly class ListUsersFilters
 - [ ] **Step 4.2: Verify it autoloads**
 
 ```bash
-vendor/bin/sail artisan tinker --execute 'dump(new App\DTO\Users\ListUsersFilters(search: "x"));'
+vendor/bin/sail artisan tinker --execute 'dump(new App\Dto\Users\ListUsersFilters(search: "x"));'
 ```
 
 Expected: dumps the object showing `search: "x"`.
@@ -348,7 +348,7 @@ Expected: dumps the object showing `search: "x"`.
 
 ```bash
 vendor/bin/sail bin pint --dirty --format agent
-git add app/DTO/Users/ListUsersFilters.php
+git add app/Dto/Users/ListUsersFilters.php
 git commit -m "feat(dto): add ListUsersFilters"
 ```
 
@@ -357,21 +357,21 @@ git commit -m "feat(dto): add ListUsersFilters"
 ## Task 5: `CreateUserInput` DTO
 
 **Files:**
-- Create: `app/DTO/Users/CreateUserInput.php`
-- Test: `tests/Unit/DTO/Users/CreateUserInputTest.php`
+- Create: `app/Dto/Users/CreateUserInput.php`
+- Test: `tests/Unit/Dto/Users/CreateUserInputTest.php`
 
 - [ ] **Step 5.1: Write the failing test**
 
-Create `tests/Unit/DTO/Users/CreateUserInputTest.php`:
+Create `tests/Unit/Dto/Users/CreateUserInputTest.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Unit\DTO\Users;
+namespace Tests\Unit\Dto\Users;
 
-use App\DTO\Users\CreateUserInput;
+use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Role;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -422,14 +422,14 @@ Expected: failure (class does not exist).
 
 - [ ] **Step 5.3: Create the DTO**
 
-Create `app/DTO/Users/CreateUserInput.php`:
+Create `app/Dto/Users/CreateUserInput.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace App\DTO\Users;
+namespace App\Dto\Users;
 
 use App\Enums\Policies\Role;
 
@@ -469,7 +469,7 @@ Expected: 2 passed.
 
 ```bash
 vendor/bin/sail bin pint --dirty --format agent
-git add app/DTO/Users/CreateUserInput.php tests/Unit/DTO/Users/CreateUserInputTest.php
+git add app/Dto/Users/CreateUserInput.php tests/Unit/Dto/Users/CreateUserInputTest.php
 git commit -m "feat(dto): add CreateUserInput"
 ```
 
@@ -478,21 +478,21 @@ git commit -m "feat(dto): add CreateUserInput"
 ## Task 6: `UpdateUserInput` DTO
 
 **Files:**
-- Create: `app/DTO/Users/UpdateUserInput.php`
-- Test: `tests/Unit/DTO/Users/UpdateUserInputTest.php`
+- Create: `app/Dto/Users/UpdateUserInput.php`
+- Test: `tests/Unit/Dto/Users/UpdateUserInputTest.php`
 
 - [ ] **Step 6.1: Write the failing test**
 
-Create `tests/Unit/DTO/Users/UpdateUserInputTest.php`:
+Create `tests/Unit/Dto/Users/UpdateUserInputTest.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Unit\DTO\Users;
+namespace Tests\Unit\Dto\Users;
 
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Role;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -553,14 +553,14 @@ Expected: failure (class does not exist).
 
 - [ ] **Step 6.3: Create the DTO**
 
-Create `app/DTO/Users/UpdateUserInput.php`:
+Create `app/Dto/Users/UpdateUserInput.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace App\DTO\Users;
+namespace App\Dto\Users;
 
 use App\Enums\Policies\Role;
 
@@ -602,7 +602,7 @@ Expected: 3 passed.
 
 ```bash
 vendor/bin/sail bin pint --dirty --format agent
-git add app/DTO/Users/UpdateUserInput.php tests/Unit/DTO/Users/UpdateUserInputTest.php
+git add app/Dto/Users/UpdateUserInput.php tests/Unit/Dto/Users/UpdateUserInputTest.php
 git commit -m "feat(dto): add UpdateUserInput"
 ```
 
@@ -625,7 +625,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Queries\Users;
 
-use App\DTO\Users\ListUsersFilters;
+use App\Dto\Users\ListUsersFilters;
 use App\Models\User;
 use App\Queries\Users\ListUsersQuery;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -701,7 +701,7 @@ declare(strict_types=1);
 
 namespace App\Queries\Users;
 
-use App\DTO\Users\ListUsersFilters;
+use App\Dto\Users\ListUsersFilters;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -851,7 +851,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Users;
 
-use App\DTO\Users\ListUsersFilters;
+use App\Dto\Users\ListUsersFilters;
 use App\Models\User;
 use App\Queries\Users\ListUsersQuery;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -968,7 +968,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Actions\Users;
 
 use App\Actions\Users\CreateUser;
-use App\DTO\Users\CreateUserInput;
+use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -1020,7 +1020,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Users;
 
-use App\DTO\Users\CreateUserInput;
+use App\Dto\Users\CreateUserInput;
 use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\DB;
@@ -1083,7 +1083,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Actions\Users;
 
 use App\Actions\Users\UpdateUser;
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -1174,7 +1174,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Users;
 
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\DB;
@@ -1575,7 +1575,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Users;
 
 use App\Actions\Users\CreateUser as CreateUserAction;
-use App\DTO\Users\CreateUserInput;
+use App\Dto\Users\CreateUserInput;
 use App\Enums\Policies\Ability;
 use App\Enums\Policies\Role;
 use App\Models\User;
@@ -1904,7 +1904,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Users;
 
 use App\Actions\Users\UpdateUser as UpdateUserAction;
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Ability;
 use App\Enums\Policies\Role;
 use App\Models\User;
@@ -2370,7 +2370,7 @@ If any step fails, the failure is a bug in this PR — open it as a follow-up st
 | Spec section | Implemented in |
 |---|---|
 | Architecture & layering | Tasks 4–11 (DTOs, query, scopes, actions) |
-| DTO placement (`app/DTO/Users/`) | Tasks 4, 5, 6 |
+| DTO placement (`app/Dto/Users/`) | Tasks 4, 5, 6 |
 | `CreateUserInput` shape | Task 5 |
 | `UpdateUserInput` shape (null = unchanged password, '' → null) | Task 6 |
 | `ListUsersFilters` shape | Task 4 |

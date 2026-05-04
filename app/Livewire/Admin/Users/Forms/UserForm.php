@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Users\Forms;
 
-use App\DTO\Users\CreateUserInput;
-use App\DTO\Users\UpdateUserInput;
+use App\Dto\Users\CreateUserInput;
+use App\Dto\Users\UpdateUserInput;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Validation\Rule;
