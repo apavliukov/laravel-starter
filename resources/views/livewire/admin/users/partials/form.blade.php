@@ -9,14 +9,14 @@
     <div class="grid gap-6 sm:grid-cols-2">
         <flux:field>
             <flux:label>{{ __('First name') }}</flux:label>
-            <flux:input wire:model="form.firstName" />
-            <flux:error class="mt-0!" name="form.firstName" />
+            <flux:input wire:model="form.first_name" />
+            <flux:error class="mt-0!" name="form.first_name" />
         </flux:field>
 
         <flux:field>
             <flux:label>{{ __('Last name') }}</flux:label>
-            <flux:input wire:model="form.lastName" />
-            <flux:error class="mt-0!" name="form.lastName" />
+            <flux:input wire:model="form.last_name" />
+            <flux:error class="mt-0!" name="form.last_name" />
         </flux:field>
     </div>
 
@@ -30,7 +30,7 @@
         <flux:label>{{ $passwordLabel }}</flux:label>
         <flux:input type="password" wire:model="form.password" />
         @if ($passwordHelp)
-            <flux:description>{{ $passwordHelp }}</flux:description>
+            <flux:description class="mt-0!">{{ $passwordHelp }}</flux:description>
         @endif
         <flux:error class="mt-0!" name="form.password" />
     </flux:field>

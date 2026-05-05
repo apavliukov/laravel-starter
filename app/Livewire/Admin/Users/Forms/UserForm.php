@@ -13,9 +13,9 @@ use Livewire\Form;
 
 final class UserForm extends Form
 {
-    public string $firstName = '';
+    public string $first_name = '';
 
-    public string $lastName = '';
+    public string $last_name = '';
 
     public string $email = '';
 
@@ -29,8 +29,8 @@ final class UserForm extends Form
 
     public function setUser(User $user): void
     {
-        $this->firstName = $user->first_name ?? '';
-        $this->lastName = $user->last_name ?? '';
+        $this->first_name = $user->first_name ?? '';
+        $this->last_name = $user->last_name ?? '';
         $this->email = $user->email ?? '';
         $this->role = $user->appRole->value;
     }
@@ -47,8 +47,8 @@ final class UserForm extends Form
         }
 
         return [
-            'firstName' => ['required', 'string', 'max:255'],
-            'lastName' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', $emailRule],
             'password' => [$this->passwordRequired ? 'required' : 'nullable', 'string', 'min:8'],
             'role' => ['required', Rule::enum(Role::class)],
@@ -58,8 +58,8 @@ final class UserForm extends Form
     public function toCreateInput(): CreateUserInput
     {
         return new CreateUserInput(
-            firstName: $this->firstName,
-            lastName: $this->lastName,
+            firstName: $this->first_name,
+            lastName: $this->last_name,
             email: $this->email,
             password: $this->password,
             role: Role::from($this->role),
@@ -69,8 +69,8 @@ final class UserForm extends Form
     public function toUpdateInput(): UpdateUserInput
     {
         return new UpdateUserInput(
-            firstName: $this->firstName,
-            lastName: $this->lastName,
+            firstName: $this->first_name,
+            lastName: $this->last_name,
             email: $this->email,
             password: $this->password === '' ? null : $this->password,
             role: Role::from($this->role),
