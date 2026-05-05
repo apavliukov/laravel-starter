@@ -19,6 +19,11 @@ enum Role: string implements HasLabelsInterface, StringMatchInterface
     case ADMIN = 'admin';
     case MEMBER = 'member';
 
+    public static function default(): self
+    {
+        return self::MEMBER;
+    }
+
     public static function fromString(string $value): ?self
     {
         return self::tryFrom($value);

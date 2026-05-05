@@ -20,7 +20,7 @@ final class CreateUser extends Component
 
     public function mount(): void
     {
-        $this->form->role = Role::MEMBER->value;
+        $this->form->role = Role::default()->value;
     }
 
     /**
