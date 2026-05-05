@@ -63,7 +63,7 @@ final class User extends Authenticatable
     #[Scope]
     protected function withRole(Builder $query, RoleEnum $role): void
     {
-        $query->whereHas('roles', fn (Builder $q) => $q->where('name', $role->value));
+        $query->whereHas('roles', fn (Builder $q) => $q->where('name', $role));
     }
 
     protected function casts(): array

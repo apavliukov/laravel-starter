@@ -28,8 +28,8 @@ final readonly class UpdateUser
 
             $user->update($attributes);
 
-            if ($user->appRole !== $input->role) {
-                $user->syncRoles([$input->role->value]);
+            if ($user->app_role !== $input->role) {
+                $user->syncRoles([$input->role]);
             }
 
             return $user->refresh();

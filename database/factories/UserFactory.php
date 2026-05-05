@@ -38,7 +38,7 @@ final class UserFactory extends Factory
     public function withRole(RoleEnum $role): self
     {
         return $this->afterCreating(function (User $user) use ($role): void {
-            $user->assignRole($role->value);
+            $user->assignRole($role);
         });
     }
 

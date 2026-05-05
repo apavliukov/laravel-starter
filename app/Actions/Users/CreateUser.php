@@ -23,7 +23,7 @@ final readonly class CreateUser
                 'password' => $this->hasher->make($input->password),
             ]);
 
-            $user->syncRoles([$input->role->value]);
+            $user->syncRoles([$input->role]);
 
             return $user;
         });

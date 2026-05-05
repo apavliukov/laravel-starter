@@ -29,8 +29,8 @@ final class DemoUserSeeder extends Seeder
                 ],
             );
 
-            if (! $user->hasRole($row['role']->value)) {
-                $user->assignRole($row['role']->value);
+            if (! $user->hasRole($row['role'])) {
+                $user->assignRole($row['role']);
             }
         }
     }

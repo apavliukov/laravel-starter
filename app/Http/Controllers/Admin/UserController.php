@@ -16,21 +16,21 @@ final class UserController extends Controller
 
     public function index(): View
     {
-        $this->authorize(Ability::VIEW_ANY->value, User::class);
+        $this->authorize(Ability::VIEW_ANY, User::class);
 
         return view('pages.admin.users.index');
     }
 
     public function create(): View
     {
-        $this->authorize(Ability::CREATE->value, User::class);
+        $this->authorize(Ability::CREATE, User::class);
 
         return view('pages.admin.users.create');
     }
 
     public function edit(User $user): View
     {
-        $this->authorize(Ability::UPDATE->value, $user);
+        $this->authorize(Ability::UPDATE, $user);
 
         return view('pages.admin.users.edit', ['user' => $user]);
     }
