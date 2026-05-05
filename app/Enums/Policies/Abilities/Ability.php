@@ -12,7 +12,7 @@ use App\Traits\Enums\HasValues;
  * Values are camelCase so Gate routes them directly to the matching policy method:
  * `Gate::authorize(Ability::VIEW_ANY, User::class)` → `UserPolicy::viewAny()`.
  *
- * Permission::makeNameFromAbility() converts the value to a space-separated DB
+ * PermissionRegistry::nameFromAbility() converts the value to a space-separated DB
  * permission string: VIEW_ANY + users → "view any users".
  *
  * System abilities (singleton Gate checks, no model) live in SystemAbility.

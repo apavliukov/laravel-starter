@@ -15,13 +15,6 @@ use PHPUnit\Framework\Attributes\Test;
 #[CoversClass(UserPolicy::class)]
 final class UserPolicyTest extends BasePolicyTest
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->policy = new UserPolicy();
-    }
-
     #[Test]
     public function admin_can_view_any_users(): void
     {
@@ -144,8 +137,8 @@ final class UserPolicyTest extends BasePolicyTest
         $this->assertFalse($this->policy->forceDelete($member, $user));
     }
 
-    protected function getPolicy(): UserPolicy
+    protected function getPolicyClass(): string
     {
-        return new UserPolicy();
+        return UserPolicy::class;
     }
 }

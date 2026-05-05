@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Helpers\Policies\PermissionRegistry;
-use App\Models\Permission;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 
 final class PermissionSeeder extends Seeder
 {
@@ -14,8 +14,11 @@ final class PermissionSeeder extends Seeder
 
     public function run(): void
     {
+        /** @var Permission $permissionClass */
+        $permissionClass = config('permission.models.permission');
+
         foreach ($this->registry->allPermissions() as $permissionName) {
-            Permission::query()->firstOrCreate([
+            $permissionClass::query()->firstOrCreate([
                 'name' => $permissionName,
                 'guard_name' => 'web',
             ]);

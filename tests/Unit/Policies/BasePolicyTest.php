@@ -15,8 +15,11 @@ abstract class BasePolicyTest extends TestCase
     {
         parent::setUp();
 
-        $this->policy = $this->getPolicy();
+        $this->policy = resolve($this->getPolicyClass());
     }
 
-    abstract protected function getPolicy(): AbstractPolicy;
+    /**
+     * @return class-string<AbstractPolicy>
+     */
+    abstract protected function getPolicyClass(): string;
 }

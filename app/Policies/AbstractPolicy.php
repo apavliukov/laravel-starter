@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\Policies\Abilities\Ability;
-use App\Models\Permission;
+use App\Helpers\Policies\PermissionRegistry;
 use App\Models\User;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +14,7 @@ abstract readonly class AbstractPolicy
 {
     protected string $modelClass;
 
-    public function __construct()
+    public function __construct(private PermissionRegistry $registry)
     {
         $this->modelClass = $this->getModelClass();
     }
@@ -60,6 +60,6 @@ abstract readonly class AbstractPolicy
     {
         $modelToCheck = $model ?? $this->modelClass;
 
-        return $user->can(Permission::makeNameFromAbility($ability, $modelToCheck));
+        return $user->can($this->registry->nameFromAbility($ability, $modelToCheck));
     }
 }

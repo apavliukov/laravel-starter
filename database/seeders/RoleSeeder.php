@@ -6,8 +6,8 @@ namespace Database\Seeders;
 
 use App\Enums\Policies\Role as RoleEnum;
 use App\Helpers\Policies\PermissionRegistry;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 final class RoleSeeder extends Seeder
 {
@@ -15,9 +15,12 @@ final class RoleSeeder extends Seeder
 
     public function run(): void
     {
+        /** @var Role $roleClass */
+        $roleClass = config('permission.models.role');
+
         foreach (RoleEnum::cases() as $roleEnum) {
             /** @var Role $role */
-            $role = Role::query()->firstOrCreate(
+            $role = $roleClass::query()->firstOrCreate(
                 ['name' => $roleEnum->value, 'guard_name' => 'web'],
             );
 

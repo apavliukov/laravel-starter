@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\Policies\Abilities\SystemAbility;
-use App\Models\Permission;
 use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
 use Illuminate\Database\Eloquent\Model;
@@ -88,7 +87,6 @@ final class AppServiceProvider extends ServiceProvider
     {
         $models = [
             User::class,
-            Permission::class,
         ];
 
         $morphMap = array_reduce($models, static function (array $result, string $model): array {
