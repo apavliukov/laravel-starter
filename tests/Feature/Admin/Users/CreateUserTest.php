@@ -60,7 +60,7 @@ final class CreateUserTest extends TestCase
         $created = User::query()->where('email', 'alice@example.test')->firstOrFail();
         $this->assertSame('Alice', $created->first_name);
         $this->assertTrue(Hash::check('secret-pass', $created->password));
-        $this->assertSame(Role::MEMBER, $created->appRole);
+        $this->assertSame(Role::MEMBER, $created->app_role);
     }
 
     #[Test]

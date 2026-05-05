@@ -38,6 +38,6 @@ final class CreateUserTest extends TestCase
         $this->assertSame('alice@example.test', $user->email);
         $this->assertNotSame('plain-pass', $user->password);
         $this->assertTrue(Hash::check('plain-pass', $user->password));
-        $this->assertSame(Role::ADMIN, $user->appRole);
+        $this->assertSame(Role::ADMIN, $user->app_role);
     }
 }

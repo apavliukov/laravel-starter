@@ -77,8 +77,8 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <flux:badge :color="$user->appRole->badgeColor()" size="sm">
-                                        {{ $user->appRole->label() }}
+                                    <flux:badge :color="$user->app_role->badgeColor()" size="sm">
+                                        {{ $user->app_role->label() }}
                                     </flux:badge>
                                 </td>
                                 <td class="px-6 py-4">

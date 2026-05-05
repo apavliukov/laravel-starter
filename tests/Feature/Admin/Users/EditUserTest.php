@@ -65,7 +65,7 @@ final class EditUserTest extends TestCase
         $this->assertSame('New', $target->first_name);
         $this->assertSame('new@example.test', $target->email);
         $this->assertTrue(Hash::check('fresh-pass', $target->password));
-        $this->assertSame(Role::ADMIN, $target->appRole);
+        $this->assertSame(Role::ADMIN, $target->app_role);
     }
 
     #[Test]

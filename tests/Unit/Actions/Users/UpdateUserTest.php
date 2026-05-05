@@ -50,7 +50,7 @@ final class UpdateUserTest extends TestCase
         $this->assertSame('new@example.test', $updated->email);
         $this->assertNotSame($originalHash, $updated->password);
         $this->assertTrue(Hash::check('fresh-pass', $updated->password));
-        $this->assertSame(Role::ADMIN, $updated->appRole);
+        $this->assertSame(Role::ADMIN, $updated->app_role);
     }
 
     #[Test]
@@ -83,6 +83,6 @@ final class UpdateUserTest extends TestCase
             role: Role::MEMBER,
         ));
 
-        $this->assertSame(Role::MEMBER, $updated->appRole);
+        $this->assertSame(Role::MEMBER, $updated->app_role);
     }
 }
