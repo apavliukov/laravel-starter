@@ -76,6 +76,27 @@ The `class="mt-0!"` on `<flux:error>` removes the default top margin so the erro
 2. Test interactive states
 3. Verify mobile responsiveness
 
+## Button Conventions
+
+All `<flux:button>` instances in admin and app views must have `size="sm"`. Auth views (`livewire/auth/`) are exempt — their full-width buttons intentionally omit size.
+
+`variant="ghost"` is reserved for icon-only dropdown triggers (e.g. the ellipsis `⋯` button). Use `variant="filled"` for all other neutral/secondary actions.
+
+```blade
+{{-- correct (admin/app) --}}
+<flux:button variant="primary" size="sm">Save</flux:button>
+<flux:button variant="filled" size="sm">Cancel</flux:button>
+<flux:button variant="danger" size="sm">Delete</flux:button>
+<flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" square />  {{-- dropdown trigger only --}}
+
+{{-- correct (auth views only) --}}
+<flux:button variant="primary" class="w-full">Log in</flux:button>
+
+{{-- wrong --}}
+<flux:button variant="primary">Save</flux:button>            {{-- missing size (non-auth) --}}
+<flux:button variant="ghost" size="sm">Cancel</flux:button>  {{-- ghost only for icon dropdown triggers --}}
+```
+
 ## Common Pitfalls
 
 - Trying to use Pro-only components in the free edition
@@ -84,3 +105,5 @@ The `class="mt-0!"` on `<flux:error>` removes the default top margin so the erro
 - Not following existing project patterns for Flux usage
 - Using `:label="..."` shorthand on `<flux:input>` — always use the explicit `<flux:field>` wrapper instead
 - Omitting `class="mt-0!"` on `<flux:error>` — this causes unwanted spacing between input and error message
+- Omitting `size="sm"` on `<flux:button>` in admin/app views — auth views are the only exception
+- Using `variant="ghost"` for regular buttons — ghost is only for icon-only dropdown triggers
