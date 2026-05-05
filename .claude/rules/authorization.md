@@ -110,9 +110,104 @@ In `AuthServiceProvider` (or `AppServiceProvider`):
 Gate::policy(Post::class, PostPolicy::class);
 ```
 
-### 5. Seed permissions
+### 5. Register permissions in PermissionRegistry
 
-Call `Post::makeAllPermissions()` in your permission seeder to get the full list of permission strings to create.
+Add the model to `allPermissions()` in `App\Helpers\Policies\PermissionRegistry`:
+
+```php
+public function allPermissions(): array
+{
+    return array_merge(
+        User::makeAllPermissions(),
+        Post::makeAllPermissions(), // ← add this
+    );
+}
+```
+
+Then re-seed: `vendor/bin/sail artisan db:seed --class=RoleAndPermissionSeeder`
+
+## Adding a New Role
+
+### 1. Add the case to the `Role` enum
+
+```php
+// app/Enums/Policies/Role.php
+case MANAGER = 'manager';
+```
+
+Add the new case to every `match($this)` in the enum: `label()`, `layout()`, `badgeColor()`.
+
+### 2. Add permissions to `PermissionRegistry`
+
+Add a private method for the role's permissions and a case to `forRole()`:
+
+```php
+// app/Helpers/Policies/PermissionRegistry.php
+public function forRole(RoleEnum $role): array
+{
+    return match($role) {
+        RoleEnum::ADMIN   => $this->adminPermissions(),
+        RoleEnum::MANAGER => $this->managerPermissions(), // ← add arm
+        RoleEnum::MEMBER  => $this->memberPermissions(),
+    };
+}
+
+private function managerPermissions(): array
+{
+    return [
+        // e.g. User::makeModelPermission(Ability::VIEW_ANY),
+    ];
+}
+```
+
+Because the match is exhaustive (no `default`), forgetting this step throws an `UnhandledMatchError` at seeding time.
+
+### 3. Re-seed
+
+```bash
+vendor/bin/sail artisan db:seed --class=RoleAndPermissionSeeder
+```
+
+### 4. Wire up the area (if the role gets its own UI)
+
+- Add middleware, route group, and layout following the existing `admin-structure.md` patterns.
+
+---
+
+## Adding a New System Ability
+
+System abilities are standalone gate checks with no model attached — never stored as Spatie permissions.
+
+### 1. Add the case to `SystemAbility`
+
+```php
+// app/Enums/Policies/Abilities/SystemAbility.php
+case ACCESS_MANAGER_AREA = 'accessManagerArea';
+```
+
+### 2. Register the gate in `AppServiceProvider`
+
+```php
+// app/Providers/AppServiceProvider.php — registerAdminAccessGate()
+Gate::define(SystemAbility::ACCESS_MANAGER_AREA, static fn (): bool => false);
+```
+
+The `false` default blocks non-admins. `Gate::before` handles the admin bypass automatically — no extra logic needed.
+
+### 3. Use it
+
+```php
+// Middleware / controller
+$user->can(SystemAbility::ACCESS_MANAGER_AREA);
+Gate::authorize(SystemAbility::ACCESS_MANAGER_AREA);
+
+// Blade
+@can(SystemAbility::ACCESS_MANAGER_AREA) ... @endcan
+```
+
+No seeding required — system abilities live entirely in PHP.
+
+---
 
 ## Custom Abilities
 
@@ -177,6 +272,76 @@ $user->is_admin
 ```
 
 Third-party package gates follow the same pattern — `Gate::define('viewHorizon', static fn (): bool => false)` and let `Gate::before` handle the bypass.
+
+## Advanced Scenarios
+
+### Super Admin Role
+
+The current `is_admin` flag + `Gate::before` bypass is designed for a **single, unconditional super admin** — one account that can do everything with no further checks. This is appropriate for most apps.
+
+If you need a named `SUPER_ADMIN` role (e.g. visible in role management UI, assignable to multiple users):
+
+1. Add `case SUPER_ADMIN = 'super_admin'` to the `Role` enum with all match arms filled.
+2. Change the `Gate::before` check from the `is_admin` boolean to a role check:
+   ```php
+   Gate::before(static fn (User $user): ?bool =>
+       $user->hasRole(Role::SUPER_ADMIN->value) ? true : null
+   );
+   ```
+3. Keep `is_admin` as a fast-path boolean on the `users` table, synced when the super admin role is assigned/revoked — or drop it and rely solely on the role check (slightly slower, hits the DB).
+4. `PermissionRegistry::forRole()` should return `[]` for `SUPER_ADMIN` — the bypass in `Gate::before` makes seeding permissions for it pointless and misleading.
+
+---
+
+### Multi-Tenancy
+
+The global `Gate::before` bypass works for a true super admin but is **too broad for tenant-scoped admins**. A tenant admin should bypass checks only within their own tenant.
+
+#### Option A — Spatie Teams (recommended)
+
+Spatie supports team-scoped permissions natively. Enable it:
+
+1. Set `'teams' => true` in `config/permission.php`.
+2. Set the active team before any permission check (typically in middleware):
+   ```php
+   // app/Http/Middleware/SetPermissionsTeam.php
+   setPermissionsTeamId($request->user()->team_id);
+   ```
+3. Seed permissions per team — `syncPermissions()` and `assignRole()` become team-aware automatically.
+4. Tenant admin bypass: add a second, scoped gate check before Spatie's:
+   ```php
+   Gate::before(static fn (User $user): ?bool =>
+       $user->is_admin ? true : null  // global super admin — unchanged
+   );
+
+   // Tenant admin bypass — fires after super admin check, before Spatie
+   Gate::before(static function (User $user, string $ability) use ($tenantId): ?bool {
+       if ($user->isTenantAdmin() && $user->team_id === $tenantId) {
+           return true;
+       }
+       return null;
+   });
+   ```
+5. Policy methods that need ownership checks override `AbstractPolicy` methods:
+   ```php
+   public function update(User $user, Post $post): bool
+   {
+       if ($post->team_id !== $user->team_id) {
+           return false;
+       }
+       return $this->userCan($user, Ability::UPDATE, $post);
+   }
+   ```
+
+#### Option B — Manual tenant scoping (no Spatie teams)
+
+If Spatie teams add too much complexity, scope at the policy level only — no bypass for tenant admins. Every policy method checks `$model->team_id === $user->team_id` before delegating to `userCan()`. Simpler, but tenant admins are subject to full Spatie permission checks.
+
+#### Key principle for both options
+
+The `Gate::before` global bypass must remain **only** for the true super admin (`is_admin`). Any scoped bypass (tenant admin, team admin) must include an explicit scope check — never a blanket `return true`.
+
+---
 
 ## Calling Authorization
 
