@@ -4,13 +4,11 @@
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form method="POST" wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
-        <flux:input
-            wire:model="email"
-            :label="__('Email Address')"
-            type="email"
-            required
-            autofocus
-        />
+        <flux:field>
+            <flux:label>{{ __('Email Address') }}</flux:label>
+            <flux:input wire:model="email" type="email" required autofocus />
+            <flux:error class="mt-0!" name="email" />
+        </flux:field>
 
         <flux:button variant="primary" type="submit" class="w-full">{{ __('Email password reset link') }}</flux:button>
     </form>

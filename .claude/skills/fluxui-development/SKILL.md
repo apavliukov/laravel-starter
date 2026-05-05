@@ -48,14 +48,17 @@ vendor/bin/sail artisan flux:icon crown grip-vertical github
 
 ### Form Fields
 
-<!-- Form Field -->
+Always use the explicit `<flux:field>` + `<flux:label>` + `<flux:error>` pattern. Never use the shorthand `:label="..."` prop on `<flux:input>` — it does not expose an error slot and is less flexible.
+
 ```blade
 <flux:field>
-    <flux:label>Email</flux:label>
+    <flux:label>{{ __('Email') }}</flux:label>
     <flux:input type="email" wire:model="email" />
-    <flux:error name="email" />
+    <flux:error class="mt-0!" name="email" />
 </flux:field>
 ```
+
+The `class="mt-0!"` on `<flux:error>` removes the default top margin so the error sits flush against the input. Always include it.
 
 ### Modals
 
@@ -79,3 +82,5 @@ vendor/bin/sail artisan flux:icon crown grip-vertical github
 - Not checking if a Flux component exists before creating custom implementations
 - Forgetting to use the `search-docs` tool for component-specific documentation
 - Not following existing project patterns for Flux usage
+- Using `:label="..."` shorthand on `<flux:input>` — always use the explicit `<flux:field>` wrapper instead
+- Omitting `class="mt-0!"` on `<flux:error>` — this causes unwanted spacing between input and error message

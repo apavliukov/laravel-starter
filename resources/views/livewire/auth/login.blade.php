@@ -4,24 +4,18 @@
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form method="POST" wire:submit="login" class="flex flex-col gap-6">
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
-            type="email"
-            required
-            autofocus
-            autocomplete="email"
-        />
+        <flux:field>
+            <flux:label>{{ __('Email address') }}</flux:label>
+            <flux:input wire:model="email" type="email" required autofocus autocomplete="email" />
+            <flux:error class="mt-0!" name="email" />
+        </flux:field>
 
         <div class="relative">
-            <flux:input
-                wire:model="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="current-password"
-                viewable
-            />
+            <flux:field>
+                <flux:label>{{ __('Password') }}</flux:label>
+                <flux:input wire:model="password" type="password" required autocomplete="current-password" viewable />
+                <flux:error class="mt-0!" name="password" />
+            </flux:field>
 
             @if (Route::has('password.request'))
                 <flux:link class="absolute inset-e-0 top-0 text-xs" :href="route('password.request')" wire:navigate>

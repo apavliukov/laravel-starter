@@ -3,10 +3,18 @@
     :tab-subheading="__('Update your name and email address')"
 >
     <form wire:submit="updateProfileInformation" class="w-full space-y-6 mb-6">
-        <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+        <flux:field>
+            <flux:label>{{ __('Name') }}</flux:label>
+            <flux:input wire:model="name" type="text" required autofocus autocomplete="name" />
+            <flux:error class="mt-0!" name="name" />
+        </flux:field>
 
         <div>
-            <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+            <flux:field>
+                <flux:label>{{ __('Email') }}</flux:label>
+                <flux:input wire:model="email" type="email" required autocomplete="email" />
+                <flux:error class="mt-0!" name="email" />
+            </flux:field>
 
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
                 <div>
