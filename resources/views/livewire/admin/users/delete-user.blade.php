@@ -1,4 +1,4 @@
-<flux:modal :name="$modalName" class="w-full max-w-md">
+<flux:modal :name="$modalName" class="w-full max-w-md text-left">
     <div class="space-y-6">
         <flux:heading size="lg">{{ __('Delete User') }}</flux:heading>
 
@@ -15,9 +15,9 @@
 
         <div class="flex justify-end gap-3">
             <flux:modal.close>
-                <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
+                <flux:button variant="filled" size="sm">{{ __('Cancel') }}</flux:button>
             </flux:modal.close>
-            <flux:button wire:click="delete" variant="danger">{{ __('Delete') }}</flux:button>
+            <flux:button wire:click="delete" variant="danger" size="sm">{{ __('Delete') }}</flux:button>
         </div>
     </div>
 </flux:modal>

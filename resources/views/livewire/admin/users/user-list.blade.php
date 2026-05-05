@@ -59,9 +59,7 @@
                                     @endif
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                                {{ __('Actions') }}
-                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
@@ -89,22 +87,37 @@
                                     </flux:text>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    @can(Ability::UPDATE, $user)
-                                        <flux:button size="sm" variant="ghost" icon="pencil"
-                                                     :href="route('admin.platform.users.edit', $user)" wire:navigate>
-                                            {{ __('Edit') }}
-                                        </flux:button>
-                                    @endcan
+                                    @canany([Ability::UPDATE, Ability::DELETE], $user)
+                                        <flux:dropdown>
+                                            <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" square />
+
+                                            <flux:menu>
+                                                @can(Ability::UPDATE, $user)
+                                                    <flux:menu.item
+                                                        icon="pencil"
+                                                        :href="route('admin.platform.users.edit', $user)"
+                                                        wire:navigate
+                                                    >
+                                                        {{ __('Edit') }}
+                                                    </flux:menu.item>
+                                                @endcan
+                                                @can(Ability::DELETE, $user)
+                                                    <flux:menu.separator />
+                                                    <flux:modal.trigger :name="'delete-user-'.$user->id">
+                                                        <flux:menu.item variant="danger" icon="trash">
+                                                            {{ __('Delete') }}
+                                                        </flux:menu.item>
+                                                    </flux:modal.trigger>
+                                                @endcan
+                                            </flux:menu>
+                                        </flux:dropdown>
+                                    @endcanany
+
                                     @can(Ability::DELETE, $user)
-                                        <flux:modal.trigger :name="'delete-user-'.$user->id">
-                                            <flux:button size="sm" variant="ghost" icon="trash">
-                                                {{ __('Delete') }}
-                                            </flux:button>
-                                        </flux:modal.trigger>
                                         <livewire:admin.users.delete-user
                                             :user="$user"
                                             :modal-name="'delete-user-'.$user->id"
-                                            wire:key="delete-user-{{ $user->id }}"/>
+                                            wire:key="delete-user-{{ $user->id }}" />
                                     @endcan
                                 </td>
                             </tr>
