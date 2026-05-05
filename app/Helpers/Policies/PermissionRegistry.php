@@ -24,7 +24,7 @@ final readonly class PermissionRegistry
     {
         $table = $model instanceof Model ? $model->getTable() : get_model_table($model);
 
-        return sprintf('%s %s', Str::snake($ability->value, ' '), $table);
+        return sprintf('%s %s', Str::snake($ability->value, ' '), str_replace('_', ' ', $table));
     }
 
     public function allPermissions(): array
