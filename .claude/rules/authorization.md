@@ -118,8 +118,8 @@ Add the model to `allPermissions()` in `App\Helpers\Policies\PermissionRegistry`
 public function allPermissions(): array
 {
     return array_merge(
-        User::makeAllPermissions(),
-        Post::makeAllPermissions(), // ← add this
+        $this->permissionsFor(User::class),
+        $this->permissionsFor(Post::class), // ← add this
     );
 }
 ```
