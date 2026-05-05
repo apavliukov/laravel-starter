@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\User;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -13,14 +14,23 @@ use Livewire\Component;
 
 final class Profile extends Component
 {
-    public string $name = '';
+    public string $first_name = '';
+
+    public string $last_name = '';
 
     public string $email = '';
 
+    public bool $showEmailVerificationLink = false;
+
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+
+        $this->first_name = $user->first_name;
+        $this->last_name = $user->last_name;
+        $this->email = $user->email;
+
+        $this->showEmailVerificationLink = $user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail();
     }
 
     public function updateProfileInformation(): void
@@ -32,7 +42,8 @@ final class Profile extends Component
         }
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
 
             'email' => [
                 'required',
@@ -53,6 +64,7 @@ final class Profile extends Component
         $user->save();
 
         $this->dispatch('profile-updated', name: $user->name);
+        $this->redirect(route('admin.settings.profile'), navigate: true);
     }
 
     public function resendVerificationNotification(): void

@@ -7,9 +7,10 @@
     'tabs' => null,
     'tabHeading' => null,
     'tabSubheading' => null,
+    'pageTitle' => null,
 ])
 
-<x-layouts.admin :title="$mainHeading">
+<x-layouts.admin :title="$pageTitle ?? $mainHeading">
     <section class="flex flex-col gap-6 lg:gap-8 w-full">
         <div class="relative w-full">
             @if (isset($header))

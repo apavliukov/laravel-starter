@@ -1,3 +1,5 @@
-<x-layouts.admin :title="__('Settings - Appearance')">
+<x-admin.settings.layout :tab-heading="__('Appearance')"
+                         :tab-subheading="__('Update the appearance settings for your account')"
+>
     <livewire:admin.settings.appearance />
-</x-layouts.admin>
+</x-admin.settings.layout>
