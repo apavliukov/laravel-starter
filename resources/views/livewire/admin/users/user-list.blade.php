@@ -66,11 +66,10 @@
                         @foreach ($this->users as $user)
                             <tr wire:key="user-{{ $user->id }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                 <td class="px-6 py-4">
-                                    <div>
-                                        <a href="{{ route('admin.platform.users.edit', $user) }}" wire:navigate
-                                           class="text-sm font-medium text-neutral-900 hover:underline dark:text-neutral-100">
+                                    <div class="flex flex-col gap-1">
+                                        <flux:link href="{{ route('admin.platform.users.edit', $user) }}" wire:navigate class="text-sm font-medium">
                                             {{ $user->name }}
-                                        </a>
+                                        </flux:link>
                                         <div class="text-xs text-neutral-500 dark:text-neutral-400">
                                             {{ $user->email }}
                                         </div>
