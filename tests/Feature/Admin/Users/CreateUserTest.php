@@ -48,8 +48,8 @@ final class CreateUserTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(CreateUser::class)
-            ->set('form.firstName', 'Alice')
-            ->set('form.lastName', 'Cooper')
+            ->set('form.first_name', 'Alice')
+            ->set('form.last_name', 'Cooper')
             ->set('form.email', 'alice@example.test')
             ->set('form.password', 'secret-pass')
             ->set('form.role', Role::MEMBER->value)
@@ -73,8 +73,8 @@ final class CreateUserTest extends TestCase
             ->set('form.role', '')
             ->call('store')
             ->assertHasErrors([
-                'form.firstName',
-                'form.lastName',
+                'form.first_name',
+                'form.last_name',
                 'form.email',
                 'form.password',
                 'form.role',
@@ -89,8 +89,8 @@ final class CreateUserTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(CreateUser::class)
-            ->set('form.firstName', 'A')
-            ->set('form.lastName', 'B')
+            ->set('form.first_name', 'A')
+            ->set('form.last_name', 'B')
             ->set('form.email', 'taken@example.test')
             ->set('form.password', 'secret-pass')
             ->set('form.role', Role::MEMBER->value)

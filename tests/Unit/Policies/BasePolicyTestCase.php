@@ -7,7 +7,7 @@ namespace Tests\Unit\Policies;
 use AlexPavliukov\Authorization\AbstractPolicy;
 use Tests\TestCase;
 
-abstract class BasePolicyTest extends TestCase
+abstract class BasePolicyTestCase extends TestCase
 {
     protected AbstractPolicy $policy;
 

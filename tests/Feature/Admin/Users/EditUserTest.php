@@ -54,7 +54,7 @@ final class EditUserTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(EditUser::class, ['user' => $target])
-            ->set('form.firstName', 'New')
+            ->set('form.first_name', 'New')
             ->set('form.email', 'new@example.test')
             ->set('form.password', 'fresh-pass')
             ->set('form.role', Role::ADMIN->value)

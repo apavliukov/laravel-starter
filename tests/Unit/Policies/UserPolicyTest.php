@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 #[Group('policies')]
 #[Group('users')]
 #[CoversClass(UserPolicy::class)]
-final class UserPolicyTest extends BasePolicyTest
+final class UserPolicyTest extends BasePolicyTestCase
 {
     #[Test]
     public function admin_can_view_any_users(): void
