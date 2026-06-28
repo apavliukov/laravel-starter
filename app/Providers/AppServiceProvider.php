@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Authorization\Enums\SystemAbility;
+use App\Enums\Policies\SystemAbility;
 use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
 use Illuminate\Database\Eloquent\Model;

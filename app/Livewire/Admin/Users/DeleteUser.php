@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Users;
 
+use AlexPavliukov\Authorization\Enums\Ability;
 use App\Actions\Users\DeleteUser as DeleteUserAction;
-use App\Authorization\Enums\Ability;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;

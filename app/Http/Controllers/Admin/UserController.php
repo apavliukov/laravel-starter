@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Authorization\Enums\Ability;
+use AlexPavliukov\Authorization\Enums\Ability;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Contracts\View\View;

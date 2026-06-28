@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Authorization\AbstractPolicy;
+use AlexPavliukov\Authorization\AbstractPolicy;
 use App\Models\User;
 
 final readonly class UserPolicy extends AbstractPolicy

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Enums\Policies;
 
-use App\Authorization\Contracts\AuthorizationRole;
+use AlexPavliukov\Authorization\Contracts\AuthorizationRole;
 use App\Enums\Policies\Role;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

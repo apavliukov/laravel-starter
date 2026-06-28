@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "apavliukov/laravel-authorization": "^0.3.0",
         "blade-ui-kit/blade-heroicons": "^2.5",
         "blade-ui-kit/blade-icons": "^1.7",
         "gehrisandro/tailwind-merge-laravel": "^1.2",
@@ -16,7 +17,7 @@
         "livewire/flux": "^2.4",
         "opcodesio/log-viewer": "^3.14",
         "sentry/sentry-laravel": "^4.15",
-        "spatie/laravel-permission": "^7.4"
+        "spatie/laravel-permission": "^8.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",

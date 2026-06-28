@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums\Policies;
 
-use App\Authorization\Contracts\AuthorizationRole;
+use AlexPavliukov\Authorization\Contracts\AuthorizationRole;
 use App\Contracts\Enums\HasLabelsInterface;
 use App\Contracts\Enums\StringMatchInterface;
 use App\Support\Roles\HasRolePresentation;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Users;
 
+use AlexPavliukov\Authorization\Enums\Ability;
 use App\Actions\Users\CreateUser as CreateUserAction;
-use App\Authorization\Enums\Ability;
 use App\Enums\Policies\Role;
 use App\Livewire\Admin\Users\Forms\UserForm;
 use App\Models\User;

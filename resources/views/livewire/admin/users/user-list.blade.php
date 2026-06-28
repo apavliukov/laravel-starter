@@ -1,4 +1,4 @@
-@php use App\Authorization\Enums\Ability; @endphp
+@php use AlexPavliukov\Authorization\Enums\Ability; @endphp
 <div class="space-y-6">
     {{-- Filters --}}
     <div class="flex flex-wrap items-end gap-4">

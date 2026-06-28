@@ -17,23 +17,48 @@ a reusable internal Composer package.
 
 ---
 
-## 0. Prerequisites — bring these from the reference app first
+## 0. First actions in the empty package folder
 
-The package author (human) should copy into this repo before you start, OR tell
-you the path to the `laravel-starter` checkout:
+You start in an EMPTY directory (the new package repo). Do this before anything
+else:
 
-1. The entire `app/Authorization/` tree — **your source material** (you will move
-   it into `src/` and rename namespaces).
-2. `docs/superpowers/specs/2026-06-27-authorization-decoupling-design.md` — the
-   design spec. **§7 (extraction boundary) and §11 (package-phase notes) are
-   authoritative** for everything below.
-3. The reference docs `meg-authorization.md` and `oohire-authorization.md` — how
-   other projects use authorization (drivers for the pluggable design).
-4. The reference app's tests under `tests/Unit/Authorization/`,
-   `tests/Feature/Authorization/`, `tests/Unit/Enums/Policies/RoleTest.php`,
-   `tests/Unit/Policies/` — you will port the package-relevant ones to Testbench.
+**0a. Get the reference checkout path.** Ask the human for the absolute path to
+their `laravel-starter` checkout (call it `$STARTER`). You need it to copy source
+material. If they can't give a path and haven't copied files in, STOP and ask.
 
-If these are not present, STOP and ask the human for them.
+**0b. Initialise the repo + skeleton.**
+```bash
+git init
+mkdir -p src tests reference
+printf 'reference/\nvendor/\ncomposer.lock\n.phpunit.result.cache\n.phpunit.cache\n' > .gitignore
+```
+(`reference/` is gitignored — it's read-only source material, never shipped.)
+
+**0c. Copy the reference material into `reference/`** (so you can read it without
+leaving the repo; it will NOT be part of the package):
+```bash
+cp -R "$STARTER/app/Authorization"                              reference/Authorization
+cp    "$STARTER/app/Enums/Policies/Role.php"                    reference/Role.php
+cp    "$STARTER/app/Support/Roles/HasRolePresentation.php"      reference/HasRolePresentation.php
+cp    "$STARTER/app/Traits/Enums/HasValues.php"                 reference/HasValues.php
+cp    "$STARTER/app/Providers/AuthorizationServiceProvider.php" reference/AppAuthorizationServiceProvider.php
+cp -R "$STARTER/tests/Unit/Authorization"                      reference/tests-Unit-Authorization
+cp -R "$STARTER/tests/Feature/Authorization"                   reference/tests-Feature-Authorization
+cp    "$STARTER/tests/Unit/Enums/Policies/RoleTest.php"         reference/RoleTest.php
+cp    "$STARTER/tests/Unit/Policies/BasePolicyTest.php"         reference/BasePolicyTest.php
+cp    "$STARTER/docs/superpowers/specs/2026-06-27-authorization-decoupling-design.md" reference/design-spec.md
+cp    "$STARTER/docs/superpowers/specs/2026-06-28-package-extraction-handoff.md"       reference/handoff.md
+cp    "$STARTER/meg-authorization.md" "$STARTER/oohire-authorization.md"               reference/
+```
+
+**0d. Read first, in this order:** `reference/design-spec.md` (esp. **§7** and
+**§11** — authoritative), then this handoff (`reference/handoff.md`), then the
+code under `reference/Authorization/`. The `meg`/`oohire` docs explain why the
+bypass is pluggable.
+
+> `reference/Authorization/` is your **source material** — you move it into `src/`
+> and rename namespaces (§1). It is NOT the package; the package is what you build
+> in `src/`.
 
 ---
 
@@ -247,8 +272,7 @@ publish the provider stub, declare its role enum + models, and authorize.
 After the package is green, adopt it in the reference app (this is the "delete
 local code, wire the package" step):
 
-1. `composer require apavliukov/laravel-authorization:dev-main` (VCS) — or the
-   local path-repo (§8) while iterating.
+1. `composer require apavliukov/laravel-authorization:dev-main` (VCS — see §8).
 2. Delete `app/Authorization/*` from the app.
 3. Rewrite references `App\Authorization\` → `AlexPavliukov\Authorization\` across
    the app (policies, `User`, providers, seeders, tests, blades `@can`).
@@ -262,20 +286,39 @@ local code, wire the package" step):
 
 ---
 
-## 8. Local dev via path-repository (optional, never committed)
+## 8. How the starter consumes this package — Composer/VCS everywhere
 
-Canonical consumption is Composer/VCS. For tight local co-development you may
-symlink, but keep it out of version control and mind Docker:
+**One mechanism for all environments: a normal Composer dependency from private
+VCS.** The starter's committed `composer.json` requires it the same way locally,
+in CI, and in prod. No symlink, no path-repository, no per-environment override.
 
-- Add the path repo to a **local, untracked** Composer override (e.g. a
-  `composer.local.json` consumed via a merge plugin, or `composer config` on your
-  machine only). Do NOT put the path repo in the committed `composer.json` — prod
-  and CI must use the VCS/Packagist require.
-- **Docker/Sail caveat:** a `path` symlink only resolves inside the Sail container
-  if the package directory is within the container's bind-mount. Place the package
-  checkout under the same mounted parent (or inside the project), or do package dev
-  outside Docker. If the symlink target is outside the mount, the container can't
-  see it and `composer install` fails there.
+```jsonc
+// starter composer.json (committed — identical local / CI / prod)
+{
+  "repositories": [
+    { "type": "vcs", "url": "git@github.com:apavliukov/laravel-authorization.git" }
+  ],
+  "require": { "apavliukov/laravel-authorization": "dev-main" }
+}
+```
+
+**Dev loop:** develop and test the package **in its own repo** (the Testbench
+suite is your fast inner loop — the starter is not needed for package work). When
+you want the starter to pick up changes: commit+push the package, then in the
+starter run `vendor/bin/sail composer update apavliukov/laravel-authorization`.
+
+**Versioning:** `dev-main` while iterating (pulls latest `main`); cut a tag and
+move the starter to `^0.1` once the API stabilises, for predictability.
+
+**Prod/CI:** identical `composer install` from VCS — the only requirement is read
+access to the private repo (a deploy key or a Composer auth token in
+`auth.json` / `COMPOSER_AUTH`). That is standard Composer auth, not specific to
+this package.
+
+> Deliberately NOT used: local path-repository / symlink, `composer-merge-plugin`,
+> `composer.local.json`, `docker-compose.override.yml`. With a real package test
+> suite the symlink buys little and adds Docker/Composer-override complexity.
+> Keep local == prod.
 
 ---
 

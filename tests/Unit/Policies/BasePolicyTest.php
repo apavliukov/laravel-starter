@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Policies;
 
-use App\Authorization\AbstractPolicy;
+use AlexPavliukov\Authorization\AbstractPolicy;
 use Tests\TestCase;
 
 abstract class BasePolicyTest extends TestCase
