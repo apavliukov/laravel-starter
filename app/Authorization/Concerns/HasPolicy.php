@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Traits\Models;
+namespace App\Authorization\Concerns;
 
-use App\Enums\Policies\Abilities\Ability;
+use App\Authorization\Enums\Ability;
 use BackedEnum;
 
 trait HasPolicy
@@ -14,7 +14,7 @@ trait HasPolicy
      * Override to restrict which abilities apply — e.g. exclude RESTORE and
      * FORCE_DELETE on models that don't use SoftDeletes.
      *
-     * @return list<Ability>
+     * @return array<int, BackedEnum>
      */
     public static function getBasicAbilities(): array
     {
@@ -30,7 +30,7 @@ trait HasPolicy
      *       return UserAbility::cases();
      *   }
      *
-     * @return list<BackedEnum>
+     * @return array<int, BackedEnum>
      */
     public static function getCustomAbilities(): array
     {

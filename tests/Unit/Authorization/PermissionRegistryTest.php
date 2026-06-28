@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Helpers\Policies;
+namespace Tests\Unit\Authorization;
 
-use App\Enums\Policies\Abilities\Ability;
-use App\Helpers\Policies\PermissionRegistry;
+use App\Authorization\AuthorizationManager;
+use App\Authorization\Enums\Ability;
+use App\Authorization\PermissionRegistry;
+use App\Enums\Policies\Role;
 use App\Models\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,7 +25,11 @@ final class PermissionRegistryTest extends TestCase
     {
         parent::setUp();
 
-        $this->registry = new PermissionRegistry();
+        $manager = new AuthorizationManager();
+        $manager->useRoleEnum(Role::class);
+        $manager->authorizableModels([User::class]);
+
+        $this->registry = new PermissionRegistry($manager);
     }
 
     /** @return array<string, array{Ability, string}> */
@@ -56,7 +62,7 @@ final class PermissionRegistryTest extends TestCase
     }
 
     #[Test]
-    public function all_permissions_includes_every_user_ability(): void
+    public function all_permissions_reflects_the_configured_models(): void
     {
         $permissions = $this->registry->allPermissions();
 

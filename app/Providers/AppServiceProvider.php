@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Enums\Policies\Abilities\SystemAbility;
+use App\Authorization\Enums\SystemAbility;
 use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Sentry\EventHint;
@@ -31,21 +30,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->enforceMorphMap();
         $this->enableModelStrictMode();
         $this->registerLogViewerAuth();
-        $this->registerAdminAccessGate();
         $this->registerCarbonMacros();
-    }
-
-    /**
-     * Admin bypasses via the Gate::before callback below; everyone else
-     * falls through to this `false` and gets 403.
-     *
-     * The ability name reflects the area's purpose — this is the *platform
-     * admin* surface, not the platform itself
-     */
-    private function registerAdminAccessGate(): void
-    {
-        Gate::define(SystemAbility::ACCESS_PLATFORM_ADMIN, static fn (): bool => false);
-        Gate::before(static fn (User $user): ?bool => $user->is_admin ? true : null);
     }
 
     private function registerCarbonMacros(): void

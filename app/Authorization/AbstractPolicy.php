@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Policies;
+namespace App\Authorization;
 
-use App\Enums\Policies\Abilities\Ability;
-use App\Helpers\Policies\PermissionRegistry;
+use App\Authorization\Enums\Ability;
 use App\Models\User;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;

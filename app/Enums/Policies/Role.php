@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace App\Enums\Policies;
 
+use App\Authorization\Contracts\AuthorizationRole;
 use App\Contracts\Enums\HasLabelsInterface;
 use App\Contracts\Enums\StringMatchInterface;
+use App\Support\Roles\HasRolePresentation;
 use App\Traits\Enums\HasLabels;
 use App\Traits\Enums\HasValues;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
 
-enum Role: string implements HasLabelsInterface, StringMatchInterface
+enum Role: string implements AuthorizationRole, HasLabelsInterface, StringMatchInterface
 {
     use HasLabels;
+    use HasRolePresentation;
     use HasValues;
 
     case ADMIN = 'admin';
@@ -45,19 +48,19 @@ enum Role: string implements HasLabelsInterface, StringMatchInterface
         };
     }
 
-    public function layout(): string
+    public function isSuperAdmin(): bool
     {
         return match ($this) {
-            self::ADMIN => 'platform',
-            self::MEMBER => 'member',
+            self::ADMIN => true,
+            self::MEMBER => false,
         };
     }
 
-    public function badgeColor(): string
+    /** @return array<int, string> */
+    public function permissions(): array
     {
         return match ($this) {
-            self::ADMIN => 'red',
-            self::MEMBER => 'zinc',
+            self::ADMIN, self::MEMBER => [],
         };
     }
 }

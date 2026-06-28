@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enums\Policies\Abilities;
+namespace App\Authorization\Enums;
 
 use App\Traits\Enums\HasValues;
 

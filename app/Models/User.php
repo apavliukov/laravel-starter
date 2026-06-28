@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Authorization\Concerns\HasPolicy;
 use App\Enums\Policies\Role as RoleEnum;
-use App\Traits\Models\HasPolicy;
 use App\Traits\Models\HasRelationTypeName;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;

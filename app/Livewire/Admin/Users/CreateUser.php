@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Users;
 
 use App\Actions\Users\CreateUser as CreateUserAction;
-use App\Enums\Policies\Abilities\Ability;
+use App\Authorization\Enums\Ability;
 use App\Enums\Policies\Role;
 use App\Livewire\Admin\Users\Forms\UserForm;
 use App\Models\User;

@@ -1,4 +1,4 @@
-@use(App\Enums\Policies\Abilities\Ability)
+@use(App\Authorization\Enums\Ability)
 @use(App\Models\User)
 
 @php /** @var User $user */ @endphp

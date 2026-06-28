@@ -5,20 +5,20 @@
 Authorization runs on two layers:
 
 **Layer 1 — Gate/Policy (who can do what):**
-`Gate::before()` in `AppServiceProvider` fires before every check. Admins short-circuit to `true` immediately. Non-admins fall through to the policy method, which checks a Spatie permission.
+`BypassStrategy::register()` is called from `AuthorizationServiceProvider::boot()` and registers a `Gate::before()` callback. It resolves all role enum cases where `isSuperAdmin()` returns `true` (via `AuthorizationManager::superAdminRoles()`) and short-circuits to `true` for users holding any of those roles via `hasAnyRole()`. Non-matching users return `null` and fall through to the policy.
 
 **Layer 2 — Spatie permissions (DB-stored fine-grained control):**
 Policy methods call `userCan($user, Ability::UPDATE, $model)` → builds a permission string (`"update users"`) → Spatie checks whether the user has that permission in the DB. Spatie intercepts this via its own `Gate::before()` callback.
 
 **Resolution order for any `can()` / `cannot()` call:**
-1. `Gate::before` — admin bypass returns `true`; non-admin returns `null` → falls through
+1. `Gate::before` (BypassStrategy) — super-admin role bypass returns `true`; others return `null` → falls through
 2. Spatie's `Gate::before` — checks DB permission string; found → `true`; not found → `null` → falls through
 3. If a model was passed → policy method is called
 4. If no model was passed → `Gate::define()` registration is called
 
 ## Abilities
 
-Standard resource abilities live in `app/Enums/Policies/Abilities/Ability.php`. Values are camelCase to match Laravel policy method names exactly:
+Standard resource abilities live in `App\Authorization\Enums\Ability`. Values are camelCase to match Laravel policy method names exactly:
 
 ```php
 case VIEW_ANY = 'viewAny';   // → policy::viewAny()
@@ -30,20 +30,20 @@ case RESTORE  = 'restore';   // → policy::restore()
 case FORCE_DELETE = 'forceDelete'; // → policy::forceDelete()
 ```
 
-System abilities (no model, standalone gate checks) live in `app/Enums/Policies/Abilities/SystemAbility.php`. These never generate model permissions.
+System abilities (no model, standalone gate checks) live in `App\Authorization\Enums\SystemAbility`. These never generate model permissions.
 
-Model-specific custom abilities (e.g. `impersonate`) get their own enum in `app/Enums/Policies/Abilities/` alongside the standard ones:
+Model-specific custom abilities (e.g. `UserAbility`) can be placed in `app/Authorization/Enums/` alongside the standard ones:
 
 ```
-app/Enums/Policies/Abilities/
+app/Authorization/Enums/
 ├── Ability.php          ← standard CRUD set
 ├── SystemAbility.php    ← standalone gate checks
-└── UserAbility.php      ← custom abilities for User model
+└── UserAbility.php      ← custom abilities for User model (example)
 ```
 
 ## Permission Names
 
-`Permission::makeNameFromAbility(BackedEnum $ability, Model|string $model)` converts any ability + model to a DB permission string:
+`PermissionRegistry::nameFromAbility(BackedEnum $ability, Model|string $model)` converts any ability + model to a DB permission string:
 
 ```
 Ability::VIEW_ANY + User  →  "view any users"
@@ -56,10 +56,10 @@ UserAbility::IMPERSONATE + User  →  "impersonate users"
 ### 1. Create the policy
 
 ```bash
-vendor/bin/sail artisan make:policy PostPolicy
+vendor/bin/sail artisan make:authorization-policy Post
 ```
 
-Extend `AbstractPolicy`, implement `getModelClass()`. That's all for standard CRUD:
+This generates `app/Policies/PostPolicy.php` extending `App\Authorization\AbstractPolicy`:
 
 ```php
 final readonly class PostPolicy extends AbstractPolicy
@@ -73,10 +73,12 @@ final readonly class PostPolicy extends AbstractPolicy
 
 Override any method that needs custom logic (e.g. `view()` checking subscription, `update()` checking ownership).
 
+Laravel auto-discovers the policy by naming convention (`App\Policies\PostPolicy` for `App\Models\Post`). No explicit `Gate::policy()` call is needed.
+
 ### 2. Add `HasPolicy` to the model
 
 ```php
-use App\Traits\Models\HasPolicy;
+use App\Authorization\Concerns\HasPolicy;
 
 class Post extends Model
 {
@@ -84,7 +86,7 @@ class Post extends Model
 }
 ```
 
-`HasPolicy` provides `getBasicAbilities()`, `getCustomAbilities()`, and `makeAllPermissions()` for permission seeding.
+`HasPolicy` provides `getBasicAbilities()`, `getCustomAbilities()`, and is used by `PermissionRegistry` for permission seeding.
 
 ### 3. Exclude abilities the model doesn't need
 
@@ -95,36 +97,31 @@ public static function getBasicAbilities(): array
 {
     return array_filter(
         Ability::cases(),
-        fn (Ability $a) => ! in_array($a, [Ability::RESTORE, Ability::FORCE_DELETE]),
+        fn (Ability $ability) => ! in_array($ability, [Ability::RESTORE, Ability::FORCE_DELETE]),
     );
 }
 ```
 
 No permission will be seeded for excluded abilities — `userCan()` returns `false` naturally.
 
-### 4. Register the policy
+### 4. Register the model with the authorization system
 
-In `AuthServiceProvider` (or `AppServiceProvider`):
-
-```php
-Gate::policy(Post::class, PostPolicy::class);
-```
-
-### 5. Register permissions in PermissionRegistry
-
-Add the model to `allPermissions()` in `App\Helpers\Policies\PermissionRegistry`:
+In `AuthorizationServiceProvider::boot()`, add the model to `Authorization::authorizableModels()`:
 
 ```php
-public function allPermissions(): array
-{
-    return array_merge(
-        $this->permissionsFor(User::class),
-        $this->permissionsFor(Post::class), // ← add this
-    );
-}
+Authorization::authorizableModels([
+    User::class,
+    Post::class, // ← add this
+]);
 ```
 
-Then re-seed: `vendor/bin/sail artisan db:seed --class=RoleAndPermissionSeeder`
+`PermissionSync` iterates these models when seeding permissions.
+
+### 5. Re-seed
+
+```bash
+vendor/bin/sail artisan db:seed --class=RoleAndPermissionSeeder
+```
 
 ## Adding a New Role
 
@@ -135,42 +132,51 @@ Then re-seed: `vendor/bin/sail artisan db:seed --class=RoleAndPermissionSeeder`
 case MANAGER = 'manager';
 ```
 
-Add the new case to every `match($this)` in the enum: `label()`, `layout()`, `badgeColor()`.
+Fill all required arms. The enum implements `AuthorizationRole` and uses `HasRolePresentation`:
 
-### 2. Add permissions to `PermissionRegistry`
+| Method | Location | Notes |
+|--------|----------|-------|
+| `label()` | `Role` enum | Translated display name |
+| `isSuperAdmin()` | `Role` enum | `true` → bypasses all gate checks |
+| `permissions()` | `Role` enum | Array of permission name strings granted to this role |
+| `layout()` | `HasRolePresentation` trait | Area layout key (e.g. `'platform'`, `'member'`) |
+| `badgeColor()` | `HasRolePresentation` trait | Flux badge colour string |
 
-Add a private method for the role's permissions and a case to `forRole()`:
+Because all `match($this)` expressions are exhaustive (no `default`), forgetting any arm throws an `UnhandledMatchError` at seeding time.
+
+Example:
 
 ```php
-// app/Helpers/Policies/PermissionRegistry.php
-public function forRole(RoleEnum $role): array
+public function isSuperAdmin(): bool
 {
-    return match($role) {
-        RoleEnum::ADMIN   => $this->adminPermissions(),
-        RoleEnum::MANAGER => $this->managerPermissions(), // ← add arm
-        RoleEnum::MEMBER  => $this->memberPermissions(),
+    return match ($this) {
+        self::ADMIN   => true,
+        self::MANAGER => false,
+        self::MEMBER  => false,
     };
 }
 
-private function managerPermissions(): array
+/** @return array<int, string> */
+public function permissions(): array
 {
-    return [
-        // e.g. User::makeModelPermission(Ability::VIEW_ANY),
-    ];
+    return match ($this) {
+        self::ADMIN, self::MANAGER => [],  // ADMIN bypasses; MANAGER seeded explicitly
+        self::MEMBER               => [],
+    };
 }
 ```
 
-Because the match is exhaustive (no `default`), forgetting this step throws an `UnhandledMatchError` at seeding time.
+Return explicit permission name strings from `permissions()` to grant them to the role on seeding. Super-admin roles can return `[]` — `Gate::before` makes seeding permissions for them unnecessary.
 
-### 3. Re-seed
+### 2. Re-seed
 
 ```bash
 vendor/bin/sail artisan db:seed --class=RoleAndPermissionSeeder
 ```
 
-### 4. Wire up the area (if the role gets its own UI)
+### 3. Wire up the area (if the role gets its own UI)
 
-- Add middleware, route group, and layout following the existing `admin-structure.md` patterns.
+Add middleware, route group, and layout following the existing `admin-structure.md` patterns.
 
 ---
 
@@ -181,18 +187,18 @@ System abilities are standalone gate checks with no model attached — never sto
 ### 1. Add the case to `SystemAbility`
 
 ```php
-// app/Enums/Policies/Abilities/SystemAbility.php
+// app/Authorization/Enums/SystemAbility.php
 case ACCESS_MANAGER_AREA = 'accessManagerArea';
 ```
 
-### 2. Register the gate in `AppServiceProvider`
+### 2. Register the gate in `AuthorizationServiceProvider`
 
 ```php
-// app/Providers/AppServiceProvider.php — registerAdminAccessGate()
+// app/Providers/AuthorizationServiceProvider.php — inside boot()
 Gate::define(SystemAbility::ACCESS_MANAGER_AREA, static fn (): bool => false);
 ```
 
-The `false` default blocks non-admins. `Gate::before` handles the admin bypass automatically — no extra logic needed.
+The `false` default blocks non-super-admin users. `BypassStrategy::register()` handles the bypass automatically — no extra logic needed.
 
 ### 3. Use it
 
@@ -213,7 +219,7 @@ No seeding required — system abilities live entirely in PHP.
 
 When a model needs abilities beyond the standard CRUD set:
 
-**1. Create a model-specific enum** in `app/Enums/Policies/Abilities/`:
+**1. Create a model-specific enum** in `app/Authorization/Enums/`:
 
 ```php
 enum UserAbility: string
@@ -242,26 +248,13 @@ public function impersonate(User $user, User $model): bool
 }
 ```
 
-`makeAllPermissions()` merges basic and custom abilities automatically — no extra seeder work needed.
+`PermissionRegistry` merges basic and custom abilities automatically when seeding — no extra seeder work needed.
 
-## System Abilities (no model)
+---
 
-For gates that don't relate to a specific model (e.g. access to an admin area):
+## `is_admin` / `is_member` Convenience Properties
 
-```php
-// AppServiceProvider
-Gate::define(SystemAbility::ACCESS_PLATFORM_ADMIN, static fn (): bool => false);
-
-// Middleware / Blade
-$user->cannot(SystemAbility::ACCESS_PLATFORM_ADMIN);
-@cannot(SystemAbility::ACCESS_PLATFORM_ADMIN)
-```
-
-The `false` default is the safety net for non-admins. `Gate::before` handles admins automatically.
-
-## `is_admin` Rule
-
-`$user->is_admin` must only appear inside the `Gate::before` callback in `AppServiceProvider`. **Everywhere else**, use the Gate:
+`$user->is_admin` and `$user->is_member` are convenience properties on the `User` model. **They must not be used for authorization decisions.** Instead, use the Gate:
 
 ```php
 // Correct
@@ -271,75 +264,51 @@ $user->can(SystemAbility::ACCESS_PLATFORM_ADMIN)
 $user->is_admin
 ```
 
-Third-party package gates follow the same pattern — `Gate::define('viewHorizon', static fn (): bool => false)` and let `Gate::before` handle the bypass.
+The super-admin bypass in `Gate::before` is handled entirely by `BypassStrategy`, which checks Spatie roles via `hasAnyRole()`, not the boolean flag.
 
-## Advanced Scenarios
-
-### Super Admin Role
-
-The current `is_admin` flag + `Gate::before` bypass is designed for a **single, unconditional super admin** — one account that can do everything with no further checks. This is appropriate for most apps.
-
-If you need a named `SUPER_ADMIN` role (e.g. visible in role management UI, assignable to multiple users):
-
-1. Add `case SUPER_ADMIN = 'super_admin'` to the `Role` enum with all match arms filled.
-2. Change the `Gate::before` check from the `is_admin` boolean to a role check:
-   ```php
-   Gate::before(static fn (User $user): ?bool =>
-       $user->hasRole(Role::SUPER_ADMIN->value) ? true : null
-   );
-   ```
-3. Keep `is_admin` as a fast-path boolean on the `users` table, synced when the super admin role is assigned/revoked — or drop it and rely solely on the role check (slightly slower, hits the DB).
-4. `PermissionRegistry::forRole()` should return `[]` for `SUPER_ADMIN` — the bypass in `Gate::before` makes seeding permissions for it pointless and misleading.
+Third-party package gates follow the same pattern — `Gate::define('viewHorizon', static fn (): bool => false)` and let `BypassStrategy` handle the bypass via the `Gate::before` callback.
 
 ---
 
-### Multi-Tenancy
+## Seeding & Consistency
 
-The global `Gate::before` bypass works for a true super admin but is **too broad for tenant-scoped admins**. A tenant admin should bypass checks only within their own tenant.
+`App\Authorization\Database\PermissionSync` is the idempotent seeding engine:
 
-#### Option A — Spatie Teams (recommended)
+- `permissions()` — iterates models registered via `Authorization::authorizableModels()`, calls `PermissionRegistry::allPermissions()`, and runs `firstOrCreate` per permission.
+- `roles()` — iterates all `Role` cases, runs `firstOrCreate` per role, then calls `role->permissions()` and syncs them to the Spatie role via `syncPermissions()`.
 
-Spatie supports team-scoped permissions natively. Enable it:
+Seeders are thin wrappers:
 
-1. Set `'teams' => true` in `config/permission.php`.
-2. Set the active team before any permission check (typically in middleware):
-   ```php
-   // app/Http/Middleware/SetPermissionsTeam.php
-   setPermissionsTeamId($request->user()->team_id);
-   ```
-3. Seed permissions per team — `syncPermissions()` and `assignRole()` become team-aware automatically.
-4. Tenant admin bypass: add a second, scoped gate check before Spatie's:
-   ```php
-   Gate::before(static fn (User $user): ?bool =>
-       $user->is_admin ? true : null  // global super admin — unchanged
-   );
+| Seeder | Calls |
+|--------|-------|
+| `PermissionSeeder` | `PermissionSync::permissions()` |
+| `RoleSeeder` | `PermissionSync::roles()` |
+| `RoleAndPermissionSeeder` | `PermissionSeeder`, `RoleSeeder` |
+| `ConsistencySeeder` | `RoleAndPermissionSeeder` (run on deploy) |
 
-   // Tenant admin bypass — fires after super admin check, before Spatie
-   Gate::before(static function (User $user, string $ability) use ($tenantId): ?bool {
-       if ($user->isTenantAdmin() && $user->team_id === $tenantId) {
-           return true;
-       }
-       return null;
-   });
-   ```
-5. Policy methods that need ownership checks override `AbstractPolicy` methods:
-   ```php
-   public function update(User $user, Post $post): bool
-   {
-       if ($post->team_id !== $user->team_id) {
-           return false;
-       }
-       return $this->userCan($user, Ability::UPDATE, $post);
-   }
-   ```
+No destructive prune — sync is additive by design.
 
-#### Option B — Manual tenant scoping (no Spatie teams)
+---
 
-If Spatie teams add too much complexity, scope at the policy level only — no bypass for tenant admins. Every policy method checks `$model->team_id === $user->team_id` before delegating to `userCan()`. Simpler, but tenant admins are subject to full Spatie permission checks.
+## Teams (Multi-Tenancy)
 
-#### Key principle for both options
+Team-scoped permissions are controlled by a single config key:
 
-The `Gate::before` global bypass must remain **only** for the true super admin (`is_admin`). Any scoped bypass (tenant admin, team admin) must include an explicit scope check — never a blanket `return true`.
+```php
+// config/permission.php
+'teams' => false,  // set to true to enable
+```
+
+When `'teams' => true`, `AuthorizationServiceProvider` pushes `App\Authorization\Teams\SetPermissionsTeam` middleware onto the `web` group. That middleware calls `Authorization::teamResolver()->resolve($request)` to get the current team ID, then passes it to Spatie via `setPermissionsTeamId()`.
+
+The default resolver (`App\Authorization\Teams\DefaultTeamResolver`) reads `$request->user()->{team_foreign_key}`. Provide a custom resolver by implementing `App\Authorization\Contracts\TeamResolver` and registering it:
+
+```php
+// In AuthorizationServiceProvider::boot()
+Authorization::resolveTeamsUsing(MyCustomTeamResolver::class);
+```
+
+The super-admin `Gate::before` bypass remains unconditional — scoped team-admin bypasses must be added as additional `Gate::before` callbacks with explicit scope checks.
 
 ---
 
