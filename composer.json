@@ -20,6 +20,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
+        "brianium/paratest": "^7.22",
         "dg/bypass-finals": "^1.9",
         "driftingly/rector-laravel": "^2.0",
         "fakerphp/faker": "^1.23",
@@ -28,6 +29,7 @@
         "larastan/larastan": "^3.0",
         "laravel/boost": "^2.4.5",
         "laravel/pail": "^1.1",
+        "laravel/pao": "^1.1",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "laravel/telescope": "^5.4",
@@ -95,6 +97,10 @@
         "phpstan": [
             "Composer\\Config::disableProcessTimeout",
             "@php ./vendor/bin/phpstan analyse"
+        ],
+        "test:parallel": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php artisan test --parallel --processes=6"
         ]
     },
     "extra": {
