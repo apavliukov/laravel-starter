@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ced0ee1395e388d636870cc80a2d2114",
+    "content-hash": "9c1d54ea5eea282c43a70a7ed637ebcb",
     "packages": [
         {
             "name": "apavliukov/laravel-authorization",
-            "version": "v0.3.1",
+            "version": "v0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apavliukov/laravel-authorization.git",
-                "reference": "178bc21c180e991e767a6c2c8332c65222e59fc9"
+                "reference": "73f9425807bff9df8d782840ecb3991c7609b679"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apavliukov/laravel-authorization/zipball/178bc21c180e991e767a6c2c8332c65222e59fc9",
-                "reference": "178bc21c180e991e767a6c2c8332c65222e59fc9",
+                "url": "https://api.github.com/repos/apavliukov/laravel-authorization/zipball/73f9425807bff9df8d782840ecb3991c7609b679",
+                "reference": "73f9425807bff9df8d782840ecb3991c7609b679",
                 "shasum": ""
             },
             "require": {
@@ -62,9 +62,9 @@
             "description": "Reusable, Spatie-permission-based authorization layer for Laravel: policies, abilities, roles, a permission registry, and a pluggable admin bypass.",
             "support": {
                 "issues": "https://github.com/apavliukov/laravel-authorization/issues",
-                "source": "https://github.com/apavliukov/laravel-authorization/tree/v0.3.1"
+                "source": "https://github.com/apavliukov/laravel-authorization/tree/v0.8.0"
             },
-            "time": "2026-06-29T11:02:06+00:00"
+            "time": "2026-07-01T15:48:07+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",
