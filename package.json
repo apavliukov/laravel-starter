@@ -1,12 +1,16 @@
 {
     "private": true,
     "type": "module",
+    "version": "1.0.0",
     "scripts": {
         "dev": "vite",
         "build": "vite build",
         "eslint-fix": "eslint --fix .",
         "prettier-fix": "prettier --write .",
-        "commitlint": "commitlint"
+        "commitlint": "commitlint",
+        "release:patch": "commit-and-tag-version --release-as patch",
+        "release:minor": "commit-and-tag-version --release-as minor",
+        "release:major": "commit-and-tag-version --release-as major"
     },
     "dependencies": {
         "@sentry/browser": "^10.69.0",
@@ -21,6 +25,7 @@
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/vite": "^4.3.3",
         "alpinejs": "^3.15.12",
+        "commit-and-tag-version": "^13.1.0",
         "cssnano": "^8.0.2",
         "eslint": "^10.8.0",
         "eslint-config-prettier": "^10.1.8",
