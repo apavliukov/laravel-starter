@@ -43,8 +43,8 @@ export default defineConfig(({ mode }) => {
         ],
         resolve: {
             alias: {
-                '~fonts-path': path.resolve(__dirname, 'resources/fonts'),
-                '~node-modules': path.resolve(__dirname, 'node_modules'),
+                '~fonts-path': path.resolve(import.meta.dirname, 'resources/fonts'),
+                '~node-modules': path.resolve(import.meta.dirname, 'node_modules'),
             },
         },
         build: {
