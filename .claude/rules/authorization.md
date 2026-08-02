@@ -37,6 +37,16 @@ public function boot(): void
 
 `Authorization` is `AlexPavliukov\Authorization\Authorization` (facade over `AuthorizationManager`). No `register()` / bindings here — the package owns them.
 
+Optional declarations, only when the app needs them:
+
+```php
+Authorization::systemAbilities(SystemAbility::class);          // deny-by-default gate per case
+Authorization::resolveTenantUsing(fn (User $user) => $user->company_id);  // for TenantScopedPolicy
+Authorization::tenantColumn('company_id');                      // default: 'tenant_id'
+Authorization::resolveTeamsUsing(fn (Request $request) => $request->user()?->company_id);
+Authorization::bypassUsing(NoBypass::class);
+```
+
 ## Abilities
 
 Standard CRUD abilities live in the package: `AlexPavliukov\Authorization\Enums\Ability`. Values are camelCase to match Laravel policy method names exactly:
@@ -147,6 +157,8 @@ protected function ownsModel(Authenticatable $user, Model $model): bool
 
 The CRUD methods are intentionally **not `final`**, so a policy that needs richer logic (e.g. "manage-across-org OR own") can still override a method and call `parent::view(...)`. Prefer the hook; override only when the hook can't express it.
 
+For plain attribute tenancy (a tenant column on the model), don't hand-write `ownsModel()` at all — extend [`TenantScopedPolicy`](#tenant-scoping--tenantscopedpolicy), which implements the hook from a single app-level declaration.
+
 ## Adding a New Role
 
 ### 1. Add the case to the `Role` enum
@@ -183,6 +195,10 @@ public function permissions(): array
 
 Super-admin roles can return `[]` — the bypass makes seeding their permissions unnecessary.
 
+For a **non-super** role, `[]` is not "no opinion" — it is an active deny-all that strips the role's permissions on every sync. Build the list with the [`Permissions` builder](#permission-sets) and read [the deny-all warning](#syncpermissions-is-authoritative--an-empty-set-means-deny-all) before leaving one empty.
+
+Order the cases from most to least privileged — `Authorization::primaryRole()` returns the first case the user holds.
+
 ### 2. Re-seed
 
 ```bash
@@ -202,12 +218,20 @@ case ACCESS_MANAGER_AREA = 'accessManagerArea';
 
 ### 2. Register the gate in the app provider
 
+Register the whole enum at once — the package defines a deny-by-default gate per case:
+
 ```php
 // AuthorizationServiceProvider::boot()
-Gate::define(SystemAbility::ACCESS_MANAGER_AREA, static fn (): bool => false);
+Authorization::systemAbilities(SystemAbility::class);
 ```
 
-The `false` default blocks non-super-admins; the package's bypass grants super-admins automatically. No seeding.
+That replaces one `Gate::define(..., fn () => false)` per case, and cannot drift when a case is added. The `false` default blocks non-super-admins; the package's bypass grants super-admins automatically. No seeding.
+
+Use it only for **bypass-only** gates. If a non-super role must hold a system ability, define that gate yourself instead — `systemAbilities()` would overwrite it with a deny-all:
+
+```php
+Gate::define(SystemAbility::ACCESS_MANAGER_AREA, static fn (User $user): bool => $user->hasRole(Role::MANAGER));
+```
 
 ### 3. Use it
 
@@ -282,19 +306,79 @@ The super-admin bypass is handled by the package's `RoleBypass` (Spatie roles vi
 
 ## Seeding & Consistency
 
-The package's `AlexPavliukov\Authorization\Database\AuthorizationSeeder` is the entry point; it drives the idempotent `PermissionSync`:
+The package's `AlexPavliukov\Authorization\Database\AuthorizationSeeder` is the entry point; it drives the idempotent `PermissionSync` through a single call:
+
+```php
+$this->sync->apply();          // permissions() → [prune] → roles()
+$this->sync->apply(prune: true);
+```
 
 - `PermissionSync::permissions()` — flushes Spatie's cache, iterates `Authorization::authorizableModels()`, and `firstOrCreate`s each permission from `PermissionRegistry::allPermissions()`.
+- `PermissionSync::prunePermissions()` — **opt-in**, runs only when `apply(prune: true)`. Deletes permissions no longer declared by the registry.
 - `PermissionSync::roles()` — `firstOrCreate`s each `Role` case, then `syncPermissions($role->permissions())`.
+- `PermissionSync::plan()` — returns the diff without writing anything. Backs `--dry-run`.
 
-The app's orchestrator seeders just call it:
+Call `apply()`; don't call `permissions()` / `roles()` directly.
+
+The app's orchestrator seeders just call the seeder:
 
 | Seeder | Calls |
 |--------|-------|
 | `ConsistencySeeder` | `AuthorizationSeeder` (run on deploy) |
 | `DatabaseSeeder` | `AuthorizationSeeder` |
 
-No destructive prune — sync is additive by design.
+### `syncPermissions()` is authoritative — an empty set means deny-all
+
+**This is the sharpest edge in the package.** `roles()` passes `$role->permissions()` straight to Spatie's `syncPermissions()`, which is a *set* operation, not a merge:
+
+```php
+$spatieRole->syncPermissions($role->permissions());
+```
+
+So a role returning `[]` has every permission **detached** on the next sync. That is deliberate — it is how a deny-all role is declared — but it means:
+
+> **The `Role` enum is the single source of truth. Any grant made outside it — by hand in the DB, in a data seeder, through an admin UI — is silently revoked on the next `ConsistencySeeder` run.**
+
+Both current cases return `[]`. `ADMIN` is unaffected in principle: `isSuperAdmin()` is `true`, so `BypassGate` short-circuits before permissions are consulted. **`MEMBER` is not** — it is a non-super role that depends entirely on DB permissions. The first permission granted to `MEMBER` outside the enum will disappear at the next deploy.
+
+When `MEMBER` needs grants, declare them in `Role::permissions()` (see [Permission Sets](#permission-sets)), never in the database.
+
+Permission *pruning* is separate and stays opt-in: `apply()` defaults to `prune: false`, and the seeder passes no argument.
+
+### `authorization:sync`
+
+Sync outside a seeder, and preview before writing:
+
+```bash
+vendor/bin/sail artisan authorization:sync --dry-run   # print the plan, change nothing
+vendor/bin/sail artisan authorization:sync             # create + grant/revoke
+vendor/bin/sail artisan authorization:sync --prune     # also delete stale permissions
+```
+
+Without `--prune`, stale permissions are reported and left in place. **Run `--dry-run` before any sync on production** — it is the only way to see a destructive role revoke coming.
+
+## Permission Sets
+
+`Role::permissions()` returns permission-name strings. Build them with the `Permissions` builder rather than hand-writing names, so they resolve through `PermissionRegistry` — the single source of name truth — and stay correct if naming changes:
+
+```php
+use AlexPavliukov\Authorization\Enums\Ability;
+use AlexPavliukov\Authorization\Support\Permissions;
+
+/** @return array<int, string> */
+public function permissions(): array
+{
+    return match ($this) {
+        self::ADMIN => [],                                    // bypasses; no grants needed
+        self::MEMBER => Permissions::make()
+            ->for(Post::class)->only(Ability::VIEW_ANY, Ability::VIEW)
+            ->forAll(Comment::class)                          // every ability of the model
+            ->all(),
+    };
+}
+```
+
+`for()` must precede `only()`. `forAll()` expands to the model's full basic + custom ability set. `all()` de-duplicates.
 
 ## Teams (Multi-Tenancy)
 
@@ -305,13 +389,112 @@ Team-scoped permissions are controlled by Spatie's flag (single source of truth)
 'teams' => false,  // set to true to enable
 ```
 
-When `true`, the package pushes `AlexPavliukov\Authorization\Teams\SetPermissionsTeam` onto the `web` group; it resolves the team id via `Authorization::teamResolver()` and calls `setPermissionsTeamId()`. The default `DefaultTeamResolver` reads `$request->user()->{team_foreign_key}`. Provide a custom one:
+When `true`, the package pushes `AlexPavliukov\Authorization\Teams\SetPermissionsTeam` onto the `web` group; it resolves the team id via `Authorization::teamResolver()` and calls `setPermissionsTeamId()`. The default `DefaultTeamResolver` reads `$request->user()->{team_foreign_key}`. Provide a custom one — a class or a closure:
 
 ```php
-Authorization::resolveTeamsUsing(MyCustomTeamResolver::class); // implements AlexPavliukov\Authorization\Contracts\TeamResolver
+Authorization::resolveTeamsUsing(MyCustomTeamResolver::class);        // implements TeamResolver
+Authorization::resolveTeamsUsing(fn (Request $request) => $request->user()?->company_id);
 ```
 
+The closure form is wrapped in `CallbackTeamResolver`.
+
 With teams on, **tenant scoping belongs in the permission layer (team-scoped roles) + `ownsModel()` — not a second bypass.** The `Gate::before` bypass stays god-mode-only (super-admin). The bypass contract is deliberately model-less, so model/team-scoped bypasses are impossible by design.
+
+### Team-aware role reads
+
+Spatie's `hasRole()` answers against the *active* permissions team. These read independently of it — use them for routing, navigation and cross-team checks:
+
+```php
+Authorization::userHasGlobalRole($user, Role::ADMIN);          // team_id IS NULL only
+Authorization::userHasRoleInTeam($user, Role::MEMBER, $teamId); // that team only
+Authorization::userHasRole($user, Role::MEMBER);                // any team, or global
+Authorization::userRolesInTeam($user, $teamId);                 // list<string>, null = global
+```
+
+Run a block under a different team, restored afterwards even if it throws:
+
+```php
+Authorization::withTeam($teamId, fn () => $user->can(Ability::UPDATE, $post));
+```
+
+### `primaryRole()`
+
+The highest-priority role the user holds, by **declaration order in the enum** — the first case they hold wins, `null` if none. Team-agnostic, so it suits landing/redirect decisions:
+
+```php
+$layout = Authorization::primaryRole($user)?->layout() ?? 'member';
+```
+
+Order the `Role` cases from most to least privileged; `primaryRole()` depends on it.
+
+### Request memoization
+
+Team-aware role reads and `userCan()` verdicts are memoized per request, keyed by (user, permission, active team). After mutating roles or grants **within the same request**, flush before reading again:
+
+```php
+Authorization::forgetUserRoles($user);        // roles + that user's permission verdicts
+Authorization::forgetUserPermissions($user);  // permission verdicts only
+```
+
+Actions that assign or revoke roles must call `forgetUserRoles()`, or later checks in the same request return stale answers.
+
+## Tenant Scoping — `TenantScopedPolicy`
+
+For attribute-based tenancy (a column on the model), extend `TenantScopedPolicy` instead of writing `ownsModel()` by hand. Declare once how to read the tenant, then policies need only `getModelClass()`:
+
+```php
+// AuthorizationServiceProvider::boot()
+Authorization::resolveTenantUsing(static fn (User $user): ?int => $user->company_id);
+Authorization::tenantColumn('company_id');   // default: 'tenant_id'
+```
+
+```php
+use AlexPavliukov\Authorization\TenantScopedPolicy;
+
+final readonly class PostPolicy extends TenantScopedPolicy
+{
+    protected function getModelClass(): string
+    {
+        return Post::class;
+    }
+}
+```
+
+`ownsModel()` then compares the user's tenant to the model's tenant column. When a model reaches its tenant through a relation, override `tenantKey()` rather than `ownsModel()`:
+
+```php
+protected function tenantKey(Model $model): int|string|null
+{
+    return $model->project?->company_id;
+}
+```
+
+`currentTenant()` throws if `resolveTenantUsing()` was never called — configure it before using `TenantScopedPolicy`.
+
+## Testing
+
+Mix `InteractsWithAuthorization` into a test case for team-aware arrangement instead of re-implementing Spatie plumbing:
+
+```php
+use AlexPavliukov\Authorization\Testing\InteractsWithAuthorization;
+
+final class PostPolicyTest extends TestCase
+{
+    use InteractsWithAuthorization;
+
+    public function test_member_cannot_update_another_teams_post(): void
+    {
+        $this->assignRoleInTeam($user, Role::MEMBER, $teamId);      // null = global
+        $this->withPermissionsTeam($teamId, fn () => /* assert */);
+        $this->resetPermissionsTeam();
+        $this->roleModelId(Role::MEMBER);                            // roles-table id
+    }
+}
+```
+
+`assignRoleInTeam()` and `withPermissionsTeam()` restore the previously active team afterwards. `roleModelId()` throws if the role was never seeded — seed roles before using it.
+
+Policy tests resolve the policy from the container (see `tests/Unit/Policies/BasePolicyTestCase.php`). Keep it that way: `AbstractPolicy`'s constructor takes package-injected dependencies, so `new SomePolicy(...)` breaks whenever they change.
 
 ## Calling Authorization
 
