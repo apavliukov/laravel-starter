@@ -7484,16 +7484,16 @@
     "packages-dev": [
         {
             "name": "apavliukov/laravel-devtools",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apavliukov/laravel-devtools.git",
-                "reference": "4e1a0392ef2821d2db6a5bf63cdeff560218cd40"
+                "reference": "63962990902de590537c59457941cb953ac91a95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apavliukov/laravel-devtools/zipball/4e1a0392ef2821d2db6a5bf63cdeff560218cd40",
-                "reference": "4e1a0392ef2821d2db6a5bf63cdeff560218cd40",
+                "url": "https://api.github.com/repos/apavliukov/laravel-devtools/zipball/63962990902de590537c59457941cb953ac91a95",
+                "reference": "63962990902de590537c59457941cb953ac91a95",
                 "shasum": ""
             },
             "require": {
@@ -7521,9 +7521,9 @@
             "description": "Shared Laravel dev tooling: the laravel-finalize Boost skill, a translation completeness checker, and a Claude Code Stop-hook backstop.",
             "support": {
                 "issues": "https://github.com/apavliukov/laravel-devtools/issues",
-                "source": "https://github.com/apavliukov/laravel-devtools/tree/v0.1.1"
+                "source": "https://github.com/apavliukov/laravel-devtools/tree/v0.1.2"
             },
-            "time": "2026-08-03T15:00:29+00:00"
+            "time": "2026-08-03T17:25:28+00:00"
         },
         {
             "name": "barryvdh/laravel-ide-helper",
