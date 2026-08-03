@@ -7,7 +7,10 @@
     "mcp": true,
     "nightwatch": false,
     "packages": [
-        "fruitcake/laravel-debugbar"
+        "apavliukov/laravel-authorization",
+        "apavliukov/laravel-devtools",
+        "fruitcake/laravel-debugbar",
+        "spatie/laravel-permission"
     ],
     "sail": true,
     "skills": [
@@ -15,6 +18,9 @@
         "configuring-horizon",
         "fluxui-development",
         "tailwindcss-development",
+        "laravel-authorization-development",
+        "laravel-permission-development",
+        "laravel-finalize",
         "debug-using-debugbar"
     ]
 }

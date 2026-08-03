@@ -36,4 +36,6 @@ yarn-error.log
 
 # State file (don’t commit)
 .yarn/install-state.gz
-yarn-error.log
+
+# boost:update artifacts; canonical copies live in ~/.claude/skills or the vendor package
+/.claude/skills/*

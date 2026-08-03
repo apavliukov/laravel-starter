@@ -1,0 +1,14 @@
+{
+    "hooks": {
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "f=\"$CLAUDE_PROJECT_DIR/vendor/apavliukov/laravel-devtools/hooks/check-translations.sh\"; [ -f \"$f\" ] || exit 0; exec bash \"$f\""
+                    }
+                ]
+            }
+        ]
+    }
+}
