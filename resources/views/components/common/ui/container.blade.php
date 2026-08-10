@@ -1,3 +1,1 @@
-<div {{ $attributes->twMerge('container') }}>
-    {{ $slot }}
-</div>
+<div {{ $attributes->twMerge('container') }}>{{ $slot }}</div>

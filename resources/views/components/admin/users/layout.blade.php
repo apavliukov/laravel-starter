@@ -13,21 +13,25 @@
 
 <x-admin.ui.layouts.main :$mainHeading :$tabHeading :$tabSubheading>
     <x-slot:headerButtons>
-        @if(! $user instanceof User)
+        @if (! $user instanceof User)
             @can(Ability::CREATE, User::class)
-                <flux:button variant="primary" size="sm" icon="plus"
-                             :href="route('admin.platform.users.create')" wire:navigate>
+                <flux:button
+                    variant="primary"
+                    size="sm"
+                    icon="plus"
+                    :href="route('admin.platform.users.create')"
+                    wire:navigate
+                >
                     {{ __('Add User') }}
                 </flux:button>
             @endcan
         @endif
     </x-slot:headerButtons>
 
-    @if($hasTabs)
+    @if ($hasTabs)
         <x-slot:tabs>
             <flux:navlist>
-                <flux:navlist.item :href="route('admin.platform.users.edit', $user)"
-                    icon="pencil" wire:navigate>
+                <flux:navlist.item :href="route('admin.platform.users.edit', $user)" icon="pencil" wire:navigate>
                     {{ __('Edit') }}
                 </flux:navlist.item>
             </flux:navlist>

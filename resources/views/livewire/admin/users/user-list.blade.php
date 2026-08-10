@@ -24,9 +24,8 @@
 
     {{-- Empty state / Table --}}
     @if ($this->users->isEmpty())
-        <div
-            class="rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.users class="mx-auto h-12 w-12 text-zinc-400"/>
+        <div class="rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
+            <flux:icon.users class="mx-auto h-12 w-12 text-zinc-400" />
             <flux:heading size="sm" class="mt-2">{{ __('No users found') }}</flux:heading>
             <flux:text class="mt-1 text-zinc-500">{{ __('No users match your current filters.') }}</flux:text>
         </div>
@@ -37,29 +36,37 @@
                     <thead class="bg-neutral-50 dark:bg-neutral-800">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 dark:text-neutral-400">
-                                <button wire:click="sortBy('name')"
-                                        class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200">
+                                <button
+                                    wire:click="sortBy('name')"
+                                    class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200"
+                                >
                                     {{ __('Name') }}
                                     @if ($sort === 'name')
-                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'"
-                                                   class="size-3"/>
+                                        <flux:icon
+                                            :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'"
+                                            class="size-3"
+                                        />
                                     @endif
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
                                 {{ __('Role') }}
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 dark:text-neutral-400">
-                                <button wire:click="sortBy('created_at')"
-                                        class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200">
+                                <button
+                                    wire:click="sortBy('created_at')"
+                                    class="flex items-center gap-1 uppercase hover:text-neutral-700 dark:hover:text-neutral-200"
+                                >
                                     {{ __('Registered') }}
                                     @if ($sort === 'created_at')
-                                        <flux:icon :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'"
-                                                   class="size-3"/>
+                                        <flux:icon
+                                            :name="$direction === 'asc' ? 'chevron-up' : 'chevron-down'"
+                                            class="size-3"
+                                        />
                                     @endif
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400"></th>
+                            <th class="px-6 py-3 text-right text-xs font-medium tracking-wider text-neutral-500 uppercase dark:text-neutral-400"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
@@ -67,7 +74,11 @@
                             <tr wire:key="user-{{ $user->id }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col gap-1">
-                                        <flux:link href="{{ route('admin.platform.users.edit', $user) }}" wire:navigate class="text-sm font-medium">
+                                        <flux:link
+                                            href="{{ route('admin.platform.users.edit', $user) }}"
+                                            wire:navigate
+                                            class="text-sm font-medium"
+                                        >
                                             {{ $user->name }}
                                         </flux:link>
                                         <div class="text-xs text-neutral-500 dark:text-neutral-400">
@@ -116,7 +127,8 @@
                                         <livewire:admin.users.delete-user
                                             :user="$user"
                                             :modal-name="'delete-user-'.$user->id"
-                                            wire:key="delete-user-{{ $user->id }}" />
+                                            wire:key="delete-user-{{ $user->id }}"
+                                        />
                                     @endcan
                                 </td>
                             </tr>

@@ -5,9 +5,7 @@
 ])
 
 <div class="flex items-start max-md:flex-col">
-    <div class="me:6 md:me-8 w-full pb-4 md:w-55">
-        {{ $tabs }}
-    </div>
+    <div class="me:6 w-full pb-4 md:me-8 md:w-55">{{ $tabs }}</div>
 
     <flux:separator class="md:hidden" />
 

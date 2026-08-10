@@ -30,18 +30,22 @@
 
         <flux:field>
             <flux:label>{{ __('Confirm password') }}</flux:label>
-            <flux:input wire:model="password_confirmation" type="password" required autocomplete="new-password" viewable />
+            <flux:input
+                wire:model="password_confirmation"
+                type="password"
+                required
+                autocomplete="new-password"
+                viewable
+            />
             <flux:error class="mt-0!" name="password_confirmation" />
         </flux:field>
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Create account') }}
-            </flux:button>
+            <flux:button type="submit" variant="primary" class="w-full"> {{ __('Create account') }} </flux:button>
         </div>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
+    <div class="space-x-1 text-center text-sm text-zinc-600 rtl:space-x-reverse dark:text-zinc-400">
         <span>{{ __('Already have an account?') }}</span>
         <flux:link :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:link>
     </div>

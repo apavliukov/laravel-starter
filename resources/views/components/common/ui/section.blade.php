@@ -1,3 +1,1 @@
-<section {{ $attributes->twMerge('section') }}>
-    {{ $slot }}
-</section>
+<section {{ $attributes->twMerge('section') }}>{{ $slot }}</section>

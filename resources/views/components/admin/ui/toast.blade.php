@@ -26,7 +26,7 @@
             x-transition:leave-end="opacity-0 transform translate-y-2"
             @mouseenter="pauseTimer(message.id)"
             @mouseleave="resumeTimer(message.id)"
-            class="bg-white dark:bg-gray-700 border-gray-300 text-neutral-900 dark:text-neutral-100 p-3 rounded-lg shadow-md border flex items-center gap-3 min-w-40 sm:min-w-75 max-w-40 sm:max-w-md"
+            class="flex max-w-40 min-w-40 items-center gap-3 rounded-lg border border-gray-300 bg-white p-3 text-neutral-900 shadow-md sm:max-w-md sm:min-w-75 dark:bg-gray-700 dark:text-neutral-100"
         >
             <div class="shrink-0" :class="getIconColorClasses(message.variant)">
                 <template x-if="message.variant === 'success'">
@@ -45,7 +45,7 @@
             <span class="flex-1 text-sm sm:text-base" x-text="message.message"></span>
             <button
                 @click="removeMessage(message.id)"
-                class="shrink-0 rounded hover:bg-gray-100 dark:hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300"
+                class="shrink-0 rounded transition-colors hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 focus:outline-none dark:hover:bg-gray-200"
             >
                 <flux:icon.x-mark class="size-4 text-gray-500" />
             </button>

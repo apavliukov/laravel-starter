@@ -23,13 +23,15 @@
 
         <flux:menu.separator />
 
-        <flux:menu.item :href="route('admin.settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+        <flux:menu.item :href="route('admin.settings.profile')" icon="cog" wire:navigate>
+            {{ __('Settings') }}</flux:menu.item>
 
         <flux:menu.separator />
 
         <form method="POST" action="{{ route('logout') }}" class="w-full">
             @csrf
-            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">{{ __('Log Out') }}</flux:menu.item>
+            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+                {{ __('Log Out') }}</flux:menu.item>
         </form>
     </flux:menu>
 </flux:dropdown>

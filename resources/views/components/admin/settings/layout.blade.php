@@ -17,19 +17,32 @@
 >
     <x-slot:tabs>
         <flux:navlist>
-            <flux:navlist.item :href="route('admin.settings.profile')" :current="request()->routeIs('admin.settings.profile')" icon="user-circle" wire:navigate>
+            <flux:navlist.item
+                :href="route('admin.settings.profile')"
+                :current="request()->routeIs('admin.settings.profile')"
+                icon="user-circle"
+                wire:navigate
+            >
                 {{ __('Profile') }}
             </flux:navlist.item>
-            <flux:navlist.item :href="route('admin.settings.password')" :current="request()->routeIs('admin.settings.password')" icon="lock-closed" wire:navigate>
+            <flux:navlist.item
+                :href="route('admin.settings.password')"
+                :current="request()->routeIs('admin.settings.password')"
+                icon="lock-closed"
+                wire:navigate
+            >
                 {{ __('Password') }}
             </flux:navlist.item>
-            <flux:navlist.item :href="route('admin.settings.appearance')" :current="request()->routeIs('admin.settings.appearance')" icon="sun" wire:navigate>
+            <flux:navlist.item
+                :href="route('admin.settings.appearance')"
+                :current="request()->routeIs('admin.settings.appearance')"
+                icon="sun"
+                wire:navigate
+            >
                 {{ __('Appearance') }}
             </flux:navlist.item>
         </flux:navlist>
     </x-slot:tabs>
 
-    <div class="w-full max-w-lg">
-        {{ $slot }}
-    </div>
+    <div class="w-full max-w-lg">{{ $slot }}</div>
 </x-admin.ui.layouts.main>

@@ -18,14 +18,18 @@
 
         <flux:field>
             <flux:label>{{ __('Confirm password') }}</flux:label>
-            <flux:input wire:model="password_confirmation" type="password" required autocomplete="new-password" viewable />
+            <flux:input
+                wire:model="password_confirmation"
+                type="password"
+                required
+                autocomplete="new-password"
+                viewable
+            />
             <flux:error class="mt-0!" name="password_confirmation" />
         </flux:field>
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Reset password') }}
-            </flux:button>
+            <flux:button type="submit" variant="primary" class="w-full"> {{ __('Reset password') }} </flux:button>
         </div>
     </form>
 </div>

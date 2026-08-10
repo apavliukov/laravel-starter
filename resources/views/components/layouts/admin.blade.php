@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        @include('partials.head.admin')
-    </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <x-admin.ui.navigation.sidebar />
+<head>
+    @include('partials.head.admin')
+</head>
+<body class="min-h-screen bg-white dark:bg-zinc-800">
+    <x-admin.ui.navigation.sidebar />
 
-        <flux:main>
-            {{ $slot }}
-        </flux:main>
+    <flux:main> {{ $slot }} </flux:main>
 
-        <x-admin.ui.toast />
+    <x-admin.ui.toast />
 
-        @vite(['resources/js/admin/admin.js'])
-        @fluxScripts
-    </body>
+    @vite(['resources/js/admin/admin.js'])
+    @fluxScripts
+</body>
 </html>
