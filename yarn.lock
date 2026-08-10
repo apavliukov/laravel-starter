@@ -1529,6 +1529,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prettier/html-tags@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@prettier/html-tags@npm:2.2.0"
+  checksum: 10c0/f3864d9cd0a080a0a7b7c88aea5576a9cae24986c4dccfa3aaef83dbc089ec1b46dfd3b825af6e7f22ea51a0277649e716c72c1d4bfc7bf419c425781f099744
+  languageName: node
+  linkType: hard
+
+"@prettier/parse-srcset@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@prettier/parse-srcset@npm:3.1.0"
+  checksum: 10c0/8dfa3c13bbad6029724280fc0d13370028887fe2397e708d3be4f3889bb1833349bac564ac3016e37ebc0dfb83141022dd94946bde3f0d862b901c2fe23df533
+  languageName: node
+  linkType: hard
+
 "@rolldown/binding-android-arm64@npm:1.2.1":
   version: 1.2.1
   resolution: "@rolldown/binding-android-arm64@npm:1.2.1"
@@ -4101,6 +4115,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-element-attributes@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "html-element-attributes@npm:3.5.0"
+  checksum: 10c0/b48a586fa3868e5a00b600bed1fcd56e12537f4bcdc073d52eb124921d48a2527a403b34088ed5b543d89d3dbf851dfe780fa2911e9f88691bc2f9a69dece988
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.2.0
   resolution: "http-cache-semantics@npm:4.2.0"
@@ -6402,6 +6423,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier-plugin-blade@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "prettier-plugin-blade@npm:3.2.2"
+  dependencies:
+    "@prettier/html-tags": "npm:^2.2.0"
+    "@prettier/parse-srcset": "npm:^3.1.0"
+    html-element-attributes: "npm:^3.5.0"
+  peerDependencies:
+    "@prettier/plugin-php": ^0.24.0
+    prettier: ^3.0.0
+    prettier-plugin-tailwindcss: ^0.7.0 || ^0.8.0
+  peerDependenciesMeta:
+    "@prettier/plugin-php":
+      optional: true
+    prettier-plugin-tailwindcss:
+      optional: true
+  checksum: 10c0/99ffa600b03fbb36b46242c19abf4b4a93b7e4294801f97297dbef6b6c81973bb94df5290d07a48699679231fb0e37d9e2fbb056359545e9c0e5105f09ec5a29
+  languageName: node
+  linkType: hard
+
 "prettier-plugin-tailwindcss@npm:^0.8.1":
   version: 0.8.1
   resolution: "prettier-plugin-tailwindcss@npm:0.8.1"
@@ -6726,6 +6767,7 @@ __metadata:
     postcss: "npm:^8.5.25"
     postcss-preset-env: "npm:^11.3.2"
     prettier: "npm:^3.9.6"
+    prettier-plugin-blade: "npm:^3.2.2"
     prettier-plugin-tailwindcss: "npm:^0.8.1"
     sass: "npm:^1.102.0"
     tailwindcss: "npm:^4.3.3"

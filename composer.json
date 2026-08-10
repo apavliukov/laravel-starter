@@ -6,7 +6,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "apavliukov/laravel-authorization": "^1.0.1",
         "blade-ui-kit/blade-heroicons": "^2.5",
         "blade-ui-kit/blade-icons": "^1.7",
@@ -59,7 +59,6 @@
         }
     },
     "scripts": {
-        "ide-helper": "@php artisan clear-compiled && php artisan ide-helper:generate && php artisan ide-helper:meta && php artisan ide-helper:models --write-mixin",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
@@ -76,34 +75,63 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
+            "@php artisan dev"
+        ],
+        "ide-helper": [
+            "@php artisan clear-compiled",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta",
+            "@php artisan ide-helper:models --write-mixin"
         ],
         "pint": [
             "Composer\\Config::disableProcessTimeout",
-            "@php ./vendor/bin/pint"
+            "@php ./vendor/bin/pint --parallel"
         ],
-        "rector-fix": [
+        "rector": [
             "Composer\\Config::disableProcessTimeout",
             "@php ./vendor/bin/rector process --clear-cache"
         ],
-        "rector-preview": [
+        "refactor": [
             "Composer\\Config::disableProcessTimeout",
-            "@php ./vendor/bin/rector process --dry-run --clear-cache --debug"
+            "@composer rector",
+            "@composer pint"
         ],
-        "rector-ci": [
+        "clean-code": [
             "Composer\\Config::disableProcessTimeout",
-            "@php ./vendor/bin/rector process --dry-run --no-progress-bar --clear-cache"
+            "@composer refactor",
+            "@composer analyse",
+            "@composer ide-helper"
         ],
-        "phpstan": [
+        "analyse": [
             "Composer\\Config::disableProcessTimeout",
             "@php ./vendor/bin/phpstan analyse"
         ],
+        "test": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php artisan config:clear --ansi @no_additional_args",
+            "@php artisan test --compact"
+        ],
         "test:parallel": [
             "Composer\\Config::disableProcessTimeout",
+            "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test --parallel --processes=6"
         ]
+    },
+    "scripts-descriptions": {
+        "dev": "Start the local dev stack (server, queue, logs, vite)",
+        "ide-helper": "Regenerate IDE helper files and model mixins",
+        "pint": "Apply Pint to PHP and Blade (append -- --dirty to scope it)",
+        "rector": "Apply Rector rules (append -- --dry-run to preview)",
+        "refactor": "rector + pint",
+        "analyse": "Run PHPStan static analysis",
+        "clean-code": "refactor + analyse + ide-helper",
+        "test": "Run the test suite (append -- --filter=Foo to scope it)",
+        "test:parallel": "Run the test suite across 6 processes"
     },
     "extra": {
         "laravel": {

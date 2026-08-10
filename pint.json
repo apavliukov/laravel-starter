@@ -6,7 +6,7 @@
         "_ide_helper_models.php",
         ".phpstorm.meta.php"
     ],
-    "notName": ["*.blade.php", "_ide_helper_*.php", ".phpstorm.meta.php"],
+    "notName": ["_ide_helper_*.php", ".phpstorm.meta.php"],
     "notPath": [
         "tmp"
     ],
@@ -26,6 +26,7 @@
         "final_internal_class": true,
         "final_public_method_for_abstract_class": false,
         "fully_qualified_strict_types": true,
+        "Pint/laravel_blade": true,
         "global_namespace_import": {
             "import_classes": true,
             "import_constants": true,

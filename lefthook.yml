@@ -23,7 +23,7 @@ pre-commit:
       priority: 3
       tags: backend
       glob: "*.php"
-      run: docker compose -f docker-compose.yml exec -T app composer run-script rector-fix {staged_files}
+      run: docker compose -f docker-compose.yml exec -T app composer run-script rector {staged_files}
       stage_fixed: true
     pint:
       priority: 4
