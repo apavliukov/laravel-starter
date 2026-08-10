@@ -6755,6 +6755,7 @@ __metadata:
     "@tailwindcss/postcss": "npm:^4.3.3"
     "@tailwindcss/vite": "npm:^4.3.3"
     alpinejs: "npm:^3.15.12"
+    chokidar: "npm:^5.0.0"
     commit-and-tag-version: "npm:^13.1.0"
     cssnano: "npm:^8.0.2"
     eslint: "npm:^10.8.0"
