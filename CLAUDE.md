@@ -30,7 +30,9 @@ Read it before mirroring a pattern: it carries conventions that evolved after th
 
 ## Test suite
 
-- Full suite: `vendor/bin/sail artisan test --compact` (no parallel script)
+- Full suite: `vendor/bin/sail composer test` (`artisan test --compact`)
+- Parallel: `vendor/bin/sail composer test:parallel` (6 processes; keeps the
+  `testing_test_1..6` databases around between runs — they are not junk)
 - Base `TestCase` extras: `Http::preventStrayRequests()` in `setUp()`; no seeding helpers
 
 ## Authorization (app specifics)
