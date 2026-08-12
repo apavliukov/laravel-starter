@@ -113,11 +113,13 @@
         ],
         "test": [
             "Composer\\Config::disableProcessTimeout",
+            "@putenv XDEBUG_MODE=off",
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test --compact"
         ],
         "test:parallel": [
             "Composer\\Config::disableProcessTimeout",
+            "@putenv XDEBUG_MODE=off",
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test --parallel --processes=6"
         ]
