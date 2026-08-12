@@ -22,9 +22,12 @@ services:
         networks:
             - sail
         depends_on:
-            - pgsql
-            - redis
-            - mailpit
+            pgsql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            mailpit:
+                condition: service_started
     pgsql:
         image: 'postgres:17'
         ports:
@@ -41,6 +44,8 @@ services:
             - sail
         healthcheck:
             test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
+            interval: 5s
+            start_period: 30s
             retries: 3
             timeout: 5s
     redis:
@@ -53,6 +58,8 @@ services:
             - sail
         healthcheck:
             test: [ "CMD", "redis-cli", "ping" ]
+            interval: 5s
+            start_period: 10s
             retries: 3
             timeout: 5s
     mailpit:
