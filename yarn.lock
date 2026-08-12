@@ -2697,9 +2697,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commit-and-tag-version@npm:^13.1.0":
-  version: 13.1.0
-  resolution: "commit-and-tag-version@npm:13.1.0"
+"commit-and-tag-version@npm:^13.1.2":
+  version: 13.1.2
+  resolution: "commit-and-tag-version@npm:13.1.2"
   dependencies:
     "@conventional-changelog/git-client": "npm:3.1.0"
     chalk: "npm:^5.6.2"
@@ -2714,11 +2714,11 @@ __metadata:
     figures: "npm:^3.2.0"
     find-up: "npm:^5.0.0"
     semver: "npm:^7.7.2"
-    yaml: "npm:^2.6.0"
+    yaml: "npm:^2.9.0"
     yargs: "npm:^17.7.2"
   bin:
     commit-and-tag-version: bin/cli.js
-  checksum: 10c0/77da518e18bb644d5e4eb31f5867b8f08d0e47231fe23bf68c0c15466a369490988e5b550756ac45515277000f7caa3845cf3fb20af6190916556ff16e852c92
+  checksum: 10c0/2cd225a201114e02c135e62a418f09de749b8e361c2d558275e9dcbfdd89162b1f8eb76416b875fe97d725165134c3c59b03a8c7343289ec677f370e65b83365
   languageName: node
   linkType: hard
 
@@ -6756,7 +6756,7 @@ __metadata:
     "@tailwindcss/vite": "npm:^4.3.3"
     alpinejs: "npm:^3.15.12"
     chokidar: "npm:^5.0.0"
-    commit-and-tag-version: "npm:^13.1.0"
+    commit-and-tag-version: "npm:^13.1.2"
     cssnano: "npm:^8.0.2"
     eslint: "npm:^10.8.0"
     eslint-config-prettier: "npm:^10.1.8"
@@ -7677,7 +7677,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.6.0":
+"yaml@npm:^2.9.0":
   version: 2.9.0
   resolution: "yaml@npm:2.9.0"
   bin:
