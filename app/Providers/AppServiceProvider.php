@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Traits\Models\HasRelationTypeName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +32,19 @@ final class AppServiceProvider extends ServiceProvider
         $this->enableModelStrictMode();
         $this->registerLogViewerAuth();
         $this->registerCarbonMacros();
+        $this->registerDevCommands();
+    }
+
+    private function registerDevCommands(): void
+    {
+        if (! $this->app->environment('local')) {
+            return;
+        }
+
+        DevCommands::except('server', 'queue');
+
+        DevCommands::artisan('horizon:listen --poll', 'horizon');
+        DevCommands::artisan('schedule:work --whisper', 'scheduler');
     }
 
     private function registerCarbonMacros(): void

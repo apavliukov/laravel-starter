@@ -52,6 +52,12 @@ export default defineConfig(({ mode }) => {
         },
         server: {
             cors: true,
+            host: '0.0.0.0',
+            port: Number(env.VITE_PORT ?? 5173),
+            strictPort: true,
+            hmr: {
+                host: 'localhost',
+            },
             watch: {
                 ignored: [
                     '**/.idea',

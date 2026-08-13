@@ -28,6 +28,18 @@ one area without a natural audience split — reference: `Users`
 **Users** — mirror `app/Livewire/Admin/Users/` and `resources/views/livewire/admin/users/`.
 Read it before mirroring a pattern: it carries conventions that evolved after the docs.
 
+## Local dev processes
+
+`sail up -d` starts the web server only — supervisord in the container is stock Sail
+(`[program:php]` alone). Horizon, the scheduler, Pail and Vite run under
+`vendor/bin/sail artisan dev`, registered in `AppServiceProvider::registerDevCommands()`
+(`server` and the default `queue` process are excluded there). A queued job that never
+runs after a bare `sail up -d` is this, not a bug — do not re-add `[program:horizon]` or
+`[program:scheduler]` to `docker/8.4/supervisord.conf`.
+
+Vite runs **inside** the container on `VITE_PORT` with `strictPort` — do not also start
+`yarn dev` on the host.
+
 ## Test suite
 
 - Full suite: `vendor/bin/sail composer test` (`artisan test --compact`)
