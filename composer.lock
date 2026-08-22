@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "989a259a2aaeaeaa645d56fc38558dba",
+    "content-hash": "495b60835433b14fae46761a3c54e67d",
     "packages": [
         {
             "name": "apavliukov/laravel-authorization",
