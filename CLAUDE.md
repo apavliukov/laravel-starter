@@ -6,20 +6,33 @@ The template repository new Laravel projects are seeded from; carries the refere
 building or refactoring any resource, Livewire component, Action, Query, or layout.** This
 file only binds those patterns to this project.
 
+Path-scoped rules live in committed `.ai/rules` — read `.ai/rules/index.md` and every rule
+file whose globs cover what you are about to edit. Record new ones with `record-rule`,
+never by hand.
+
 ## Topology: T2 (role-split admin)
 
 | Area | Namespace | View path | Route prefix | URL | Middleware |
 |------|-----------|-----------|--------------|-----|-----------|
-| **Platform** | `App\...\Admin\Platform\` | `admin/platform/` | `admin.platform.*` | `/admin/platform/*` | `EnsureUserIsPlatformAdmin` |
-| **Member** | `App\...\Admin\Member\` | `admin/member/` | `admin.member.*` | `/admin/member/*` | `EnsureUserIsMember` |
+| **Platform** | `App\...\Admin\Platform\` | `admin/platform/` | `admin.platform.*` | `/admin/*` | `EnsurePlatformAdminAccessMiddleware` |
+| **Member** | `App\...\Admin\Member\` | `admin/member/` | `admin.member.*` | `/admin/*` | none |
 
 Platform is the cross-app super-admin area; Member is the authenticated user's portal.
-Routes live in `routes/admin/{platform,member}.php`. The base layout `x-layouts.admin`
-auto-routes to the area layout by the authenticated user's role.
+Routes live in `routes/admin/{platform,member}.php`, both wired from `routes/admin.php`
+under `['auth', 'verified']` and the `/admin` prefix.
 
-Flat (shared) resources (no area segment in the namespace) are used for resources owned by
-one area without a natural audience split — reference: `Users`
-(`app/Livewire/Admin/Users/`, route under `admin.platform.*`).
+**The area split is route names only — neither group adds a URL segment.** `platform.php`
+serves `/admin/users`, not `/admin/platform/users`. `routes/admin/member.php` is empty and
+carries no middleware of its own, so anything added there is reachable by every
+authenticated, verified user until a gate is attached. See `.ai/rules/admin.md`.
+
+No area-specific Livewire namespace or view subtree exists yet: both current resources are
+the canon's flat (shared) form — `App\Livewire\Admin\{Resources}\` with the route in the
+owning area's group (reference: `Users` under `admin.platform.*`). The `{Area}` segment
+appears the first time a resource genuinely differs by audience.
+
+Where the areas *are* materialized today: `components/admin/{platform,member}/navigation/`
+(menus) and `components/admin/dashboard/{platform,member}.blade.php` (dashboard bodies).
 
 ## Tenancy: none
 
@@ -66,15 +79,22 @@ Package mechanics live in the `laravel-authorization-development` skill shipped 
 
 ## Skills
 
-Relevant global Boost skills: `laravel-best-practices`, `configuring-horizon`,
-`fluxui-development`, `tailwindcss-development`, `debug-using-debugbar`,
-`laravel-permission-development`.
+All Boost skills live in git-ignored `.claude/skills/`, installed by `boost:update` and
+version-matched to this project (Laravel 13, Livewire 4, Flux 2, Tailwind 4,
+laravel-permission 8). Never hand-edit them; overrides go in `.ai/skills/{name}/SKILL.md`.
 
-Package-shipped into git-ignored `.claude/skills/` by `boost:update`:
-`laravel-authorization-development`, `laravel-finalize` (translation checker:
-`vendor/bin/sail php vendor/bin/check-translations`; Stop hook in
-`.claude/settings.json` runs the packaged backstop).
+`laravel-finalize` ships the translation checker
+(`vendor/bin/sail php vendor/bin/check-translations`); the Stop hook in
+`.claude/settings.json` runs the packaged backstop.
+
+Hand-written cross-project skills stay global: `laravel-app-patterns` above all.
 
 ## Deviations from canon
 
-- (none)
+- **No auto-routing area layout.** Canon T2 has `x-layouts.admin` pick the area layout
+  from the authenticated user's role. Here `x-layouts.admin` is a single flat shell and
+  the role branch sits one level down: `Role::layout()` feeds `x-dynamic-component` in
+  `admin.ui.navigation.sidebar` (which menu) and `pages/admin/dashboard/index` (which
+  dashboard body). Keep this shape until an area needs genuinely different chrome.
+- **No URL prefix per area** — see Topology above. Deliberate: the areas differ by
+  audience, not by address.
