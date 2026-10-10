@@ -10,6 +10,15 @@
         </flux:navlist.item>
 
         <flux:navlist.item
+            icon="building-office"
+            :href="route('admin.platform.organizations.index')"
+            :current="request()->routeIs('admin.platform.organizations.*')"
+            wire:navigate
+        >
+            {{ __('Organizations') }}
+        </flux:navlist.item>
+
+        <flux:navlist.item
             icon="users"
             :href="route('admin.platform.users.index')"
             :current="request()->routeIs('admin.platform.users.*')"

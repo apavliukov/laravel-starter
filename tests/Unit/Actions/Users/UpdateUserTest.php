@@ -65,6 +65,7 @@ final class UpdateUserTest extends TestCase
             email: $user->email,
             password: null,
             role: Role::MEMBER,
+            organizationId: $user->organization_id,
         ));
 
         $this->assertSame($originalHash, $updated->password);
@@ -81,6 +82,7 @@ final class UpdateUserTest extends TestCase
             email: $user->email,
             password: null,
             role: Role::MEMBER,
+            organizationId: $user->organization_id,
         ));
 
         $this->assertSame(Role::MEMBER, $updated->app_role);

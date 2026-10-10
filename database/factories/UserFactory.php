@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use AlexPavliukov\Authorization\Authorization;
+use AlexPavliukov\Authorization\Tenancy\TenantMembership;
 use App\Enums\Policies\Role as RoleEnum;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +24,7 @@ final class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'organization_id' => null,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
@@ -35,10 +39,23 @@ final class UserFactory extends Factory
         return $this->state(fn (): array => ['email_verified_at' => null]);
     }
 
+    public function forOrganization(Organization $organization): self
+    {
+        return $this->state(fn (): array => ['organization_id' => $organization->id]);
+    }
+
+    /** ADMIN is a global assignment; every other role lives in the user's organization team. */
     public function withRole(RoleEnum $role): self
     {
         return $this->afterCreating(function (User $user) use ($role): void {
-            $user->assignRole($role);
+            if ($role->isSuperAdmin()) {
+                Authorization::withTeam(null, static fn (): User => $user->assignRole($role));
+                Authorization::forgetUserRoles($user);
+
+                return;
+            }
+
+            resolve(TenantMembership::class)->add($user, $user->organization_id, $role);
         });
     }
 
@@ -47,8 +64,13 @@ final class UserFactory extends Factory
         return $this->withRole(RoleEnum::ADMIN);
     }
 
-    public function member(): self
+    /** Creates an organization when none was given — a member without one is an invalid state. */
+    public function member(?Organization $organization = null): self
     {
-        return $this->withRole(RoleEnum::MEMBER);
+        return $this
+            ->state(fn (array $attributes): array => [
+                'organization_id' => $organization?->id ?? $attributes['organization_id'] ?? Organization::factory(),
+            ])
+            ->withRole(RoleEnum::MEMBER);
     }
 }

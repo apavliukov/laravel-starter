@@ -14,6 +14,7 @@ final readonly class UpdateUserInput
         public string $email,
         public ?string $password,
         public Role $role,
+        public ?int $organizationId = null,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -27,6 +28,7 @@ final readonly class UpdateUserInput
             email: $data['email'],
             password: $password === '' ? null : $password,
             role: Role::from($data['role']),
+            organizationId: isset($data['organization_id']) ? (int) $data['organization_id'] : null,
         );
     }
 }

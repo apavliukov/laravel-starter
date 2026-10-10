@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
+use AlexPavliukov\Authorization\Tenancy\EnsurePlatformArea;
+use AlexPavliukov\Authorization\Tenancy\EnsureTenantSelected;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Middleware\EnsurePlatformAdminAccessMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])
@@ -29,9 +30,10 @@ Route::middleware(['auth', 'verified'])
             });
 
         Route::name('platform.')
-            ->middleware(EnsurePlatformAdminAccessMiddleware::class)
+            ->middleware(EnsurePlatformArea::class)
             ->group(base_path('routes/admin/platform.php'));
 
         Route::name('member.')
+            ->middleware(EnsureTenantSelected::class)
             ->group(base_path('routes/admin/member.php'));
     });

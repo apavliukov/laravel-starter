@@ -52,6 +52,9 @@
                             <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
                                 {{ __('Role') }}
                             </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
+                                {{ __('Organization') }}
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium tracking-wider text-neutral-500 dark:text-neutral-400">
                                 <button
                                     wire:click="sortBy('created_at')"
@@ -90,6 +93,9 @@
                                     <flux:badge :color="$user->app_role->badgeColor()" size="sm">
                                         {{ $user->app_role->label() }}
                                     </flux:badge>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <flux:text class="text-sm">{{ $user->organization?->name ?? '—' }}</flux:text>
                                 </td>
                                 <td class="px-6 py-4">
                                     <flux:text class="text-sm" title="{{ $user->created_at->smartDateTime() }}">

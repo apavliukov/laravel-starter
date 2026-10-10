@@ -6,11 +6,16 @@ namespace App\Providers;
 
 use AlexPavliukov\Authorization\Authorization;
 use App\Enums\Policies\Role;
-use App\Enums\Policies\SystemAbility;
+use App\Models\Organization;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Tenancy itself is configured in config/authorization.php (Organization is the
+ * tenant and the Spatie team, resolved from users.organization_id). The package
+ * registers the deny-all SystemAbility::ACCESS_PLATFORM_ADMIN gate once tenancy
+ * is on; only the super-admin bypass can satisfy it.
+ */
 final class AuthorizationServiceProvider extends ServiceProvider
 {
     public function boot(): void
@@ -18,9 +23,8 @@ final class AuthorizationServiceProvider extends ServiceProvider
         Authorization::useRoleEnum(Role::class);
 
         Authorization::authorizableModels([
+            Organization::class,
             User::class,
         ]);
-
-        Gate::define(SystemAbility::ACCESS_PLATFORM_ADMIN, static fn (): bool => false);
     }
 }

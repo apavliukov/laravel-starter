@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "495b60835433b14fae46761a3c54e67d",
+    "content-hash": "be29898bca266bc5199d19d123764d83",
     "packages": [
         {
             "name": "apavliukov/laravel-authorization",
-            "version": "v1.0.1",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apavliukov/laravel-authorization.git",
-                "reference": "a6161604cfe5ff1e98b90cd9c9a8e541c789c244"
+                "reference": "f0629ed621139e7bd92711478b515cc4dad007c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apavliukov/laravel-authorization/zipball/a6161604cfe5ff1e98b90cd9c9a8e541c789c244",
-                "reference": "a6161604cfe5ff1e98b90cd9c9a8e541c789c244",
+                "url": "https://api.github.com/repos/apavliukov/laravel-authorization/zipball/f0629ed621139e7bd92711478b515cc4dad007c8",
+                "reference": "f0629ed621139e7bd92711478b515cc4dad007c8",
                 "shasum": ""
             },
             "require": {
@@ -34,6 +34,7 @@
             "require-dev": {
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.13",
+                "livewire/livewire": "^4.4",
                 "orchestra/testbench": "^11.0",
                 "phpunit/phpunit": "^11.5 || ^12.0"
             },
@@ -62,9 +63,9 @@
             "description": "Reusable, Spatie-permission-based authorization layer for Laravel: policies, abilities, roles, a permission registry, and a pluggable admin bypass.",
             "support": {
                 "issues": "https://github.com/apavliukov/laravel-authorization/issues",
-                "source": "https://github.com/apavliukov/laravel-authorization/tree/v1.0.1"
+                "source": "https://github.com/apavliukov/laravel-authorization/tree/v1.1.1"
             },
-            "time": "2026-08-03T10:58:59+00:00"
+            "time": "2026-08-24T14:41:49+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",

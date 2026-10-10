@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\OrganizationController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,5 +15,17 @@ Route::prefix('users')
         Route::get('/create', 'create')
             ->name('create');
         Route::get('/{user}/edit', 'edit')
+            ->name('edit');
+    });
+
+Route::prefix('organizations')
+    ->name('organizations.')
+    ->controller(OrganizationController::class)
+    ->group(function (): void {
+        Route::get('/', 'index')
+            ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::get('/{organization}/edit', 'edit')
             ->name('edit');
     });

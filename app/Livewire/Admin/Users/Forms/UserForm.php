@@ -23,6 +23,8 @@ final class UserForm extends Form
 
     public string $role = '';
 
+    public ?int $organization_id = null;
+
     public ?int $ignoreUserId = null;
 
     public bool $passwordRequired = true;
@@ -33,6 +35,7 @@ final class UserForm extends Form
         $this->last_name = $user->last_name ?? '';
         $this->email = $user->email ?? '';
         $this->role = $user->appRole->value;
+        $this->organization_id = $user->organization_id;
     }
 
     /**
@@ -52,6 +55,12 @@ final class UserForm extends Form
             'email' => ['required', 'email', 'max:255', $emailRule],
             'password' => [$this->passwordRequired ? 'required' : 'nullable', 'string', 'min:8'],
             'role' => ['required', Rule::enum(Role::class)],
+            'organization_id' => [
+                Rule::requiredIf(fn (): bool => ! (Role::tryFrom($this->role)?->isSuperAdmin() ?? true)),
+                'nullable',
+                'integer',
+                Rule::exists('organizations', 'id')->whereNull('deleted_at'),
+            ],
         ];
     }
 
@@ -63,6 +72,7 @@ final class UserForm extends Form
             email: $this->email,
             password: $this->password,
             role: Role::from($this->role),
+            organizationId: $this->organization_id,
         );
     }
 
@@ -74,6 +84,7 @@ final class UserForm extends Form
             email: $this->email,
             password: $this->password === '' ? null : $this->password,
             role: Role::from($this->role),
+            organizationId: $this->organization_id,
         );
     }
 }

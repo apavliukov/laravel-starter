@@ -5,5 +5,5 @@ paths:
 
 # Admin
 
-## The platform/member split is route names only
-Neither group adds a URL prefix: routes/admin/platform.php serves /admin/users, not /admin/platform/users. Only the platform group is gated, by EnsurePlatformAdminAccessMiddleware. routes/admin/member.php carries no middleware of its own, so anything added there is reachable by every authenticated, verified user — attach the gate explicitly.
+## Area gates are the package tenancy middleware
+Neither group adds a URL prefix: routes/admin/platform.php serves /admin/users, not /admin/platform/users. The platform group runs under AlexPavliukov\Authorization\Tenancy\EnsurePlatformArea (deny-all accessPlatformAdmin gate + request-wide tenant bypass); the member group under EnsureTenantSelected (403 without an organization). Do not write app-side gate middleware — attach one of these two to every new group, and never leave a group ungated.

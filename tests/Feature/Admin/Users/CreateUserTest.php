@@ -6,6 +6,7 @@ namespace Tests\Feature\Admin\Users;
 
 use App\Enums\Policies\Role;
 use App\Livewire\Admin\Users\CreateUser;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -45,6 +46,31 @@ final class CreateUserTest extends TestCase
     public function admin_can_create_a_user(): void
     {
         $admin = User::factory()->admin()->create();
+        $organization = Organization::factory()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(CreateUser::class)
+            ->set('form.first_name', 'Alice')
+            ->set('form.last_name', 'Cooper')
+            ->set('form.email', 'alice@example.test')
+            ->set('form.password', 'secret-pass')
+            ->set('form.role', Role::MEMBER->value)
+            ->set('form.organization_id', $organization->id)
+            ->call('store')
+            ->assertHasNoErrors()
+            ->assertRedirect();
+
+        $created = User::query()->where('email', 'alice@example.test')->firstOrFail();
+        $this->assertSame('Alice', $created->first_name);
+        $this->assertTrue(Hash::check('secret-pass', $created->password));
+        $this->assertSame(Role::MEMBER, $created->app_role);
+        $this->assertSame($organization->id, $created->organization_id);
+    }
+
+    #[Test]
+    public function validation_requires_an_organization_for_members(): void
+    {
+        $admin = User::factory()->admin()->create();
         $this->actingAs($admin);
 
         Livewire::test(CreateUser::class)
@@ -54,13 +80,7 @@ final class CreateUserTest extends TestCase
             ->set('form.password', 'secret-pass')
             ->set('form.role', Role::MEMBER->value)
             ->call('store')
-            ->assertHasNoErrors()
-            ->assertRedirect();
-
-        $created = User::query()->where('email', 'alice@example.test')->firstOrFail();
-        $this->assertSame('Alice', $created->first_name);
-        $this->assertTrue(Hash::check('secret-pass', $created->password));
-        $this->assertSame(Role::MEMBER, $created->app_role);
+            ->assertHasErrors(['form.organization_id']);
     }
 
     #[Test]

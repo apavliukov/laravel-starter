@@ -44,4 +44,16 @@
         </flux:select>
         <flux:error class="mt-0!" name="form.role" />
     </flux:field>
+
+    <flux:field>
+        <flux:label>{{ __('Organization') }}</flux:label>
+        <flux:select wire:model="form.organization_id" :placeholder="__('No organization')">
+            <flux:select.option value="">{{ __('No organization') }}</flux:select.option>
+            @foreach ($this->organizationOptions as $organization)
+                <flux:select.option :value="$organization->id">{{ $organization->name }}</flux:select.option>
+            @endforeach
+        </flux:select>
+        <flux:description class="mt-0!">{{ __('Required for members; admins may stay outside any organization.') }}</flux:description>
+        <flux:error class="mt-0!" name="form.organization_id" />
+    </flux:field>
 </div>

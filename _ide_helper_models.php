@@ -13,8 +13,39 @@ declare(strict_types=1);
  */
 
 namespace App\Models{
-    use AllowDynamicProperties;
+    /**
+     * The tenant: every member belongs to exactly one organization, and the
+     * organization is also the Spatie permissions team that scopes member roles.
+     *
+     * @property int $id
+     * @property string $name
+     * @property \Illuminate\Support\Carbon|null $created_at
+     * @property \Illuminate\Support\Carbon|null $updated_at
+     * @property \Illuminate\Support\Carbon|null $deleted_at
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $users
+     * @property-read int|null $users_count
+     *
+     * @method static \Database\Factories\OrganizationFactory factory($count = null, $state = [])
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newModelQuery()
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newQuery()
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization onlyTrashed()
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization query()
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization search(string $term)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereCreatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereDeletedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereName($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereUpdatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization withTrashed(bool $withTrashed = true)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization withoutTrashed()
+     *
+     * @mixin \Eloquent
+     */
+    #[\AllowDynamicProperties]
+    final class IdeHelperOrganization {}
+}
 
+namespace App\Models{
     /**
      * @property int $id
      * @property string $first_name
@@ -26,6 +57,7 @@ namespace App\Models{
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
+     * @property int|null $organization_id
      * @property-read \App\Enums\Policies\Role $app_role
      * @property-read string $initials
      * @property-read bool $is_admin
@@ -33,11 +65,12 @@ namespace App\Models{
      * @property-read string $name
      * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
      * @property-read int|null $notifications_count
+     * @property-read Organization|null $organization
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
      * @property-read int|null $permissions_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
      * @property-read int|null $roles_count
-     * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $teams
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, Organization> $teams
      * @property-read int|null $teams_count
      *
      * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
@@ -54,8 +87,12 @@ namespace App\Models{
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereFirstName($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereHasGlobalRole(\BackedEnum|string $role)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereHasRole(\BackedEnum|string $role)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereHasRoleInTeam(\BackedEnum|string $role, string|int $teamId)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLastName($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereOrganizationId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
@@ -68,6 +105,6 @@ namespace App\Models{
      *
      * @mixin \Eloquent
      */
-    #[AllowDynamicProperties]
+    #[\AllowDynamicProperties]
     final class IdeHelperUser {}
 }
