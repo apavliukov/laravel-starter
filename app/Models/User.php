@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use AlexPavliukov\Authorization\Authorization;
+use AlexPavliukov\Authorization\Concerns\HasAppRole;
 use AlexPavliukov\Authorization\Concerns\HasPolicy;
 use AlexPavliukov\Authorization\Concerns\HasTeamAwareRoles;
+use AlexPavliukov\Authorization\Tenancy\Concerns\HasTenantMemberships;
 use App\Enums\Policies\Role as RoleEnum;
 use App\Traits\Models\HasRelationTypeName;
 use Database\Factories\UserFactory;
@@ -17,19 +18,21 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
-use RuntimeException;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
+ * Membership and identity come from the authorization package: `tenants()`
+ * lists the organizations the user holds a role in (model_has_roles.team_id),
+ * `app_role` / `is_platform_admin` read roles team-agnostically. Never
+ * hasRole() — Spatie only sees the active team.
+ *
  * @mixin IdeHelperUser
  */
 #[Fillable([
-    'organization_id',
     'first_name',
     'last_name',
     'email',
@@ -41,20 +44,16 @@ use Spatie\Permission\Traits\HasRoles;
 ])]
 final class User extends Authenticatable
 {
+    use HasAppRole;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasPolicy;
     use HasRelationTypeName;
     use HasRoles;
     use HasTeamAwareRoles;
+    use HasTenantMemberships;
     use Notifiable;
     use SoftDeletes;
-
-    /** @return BelongsTo<Organization, $this> */
-    public function organization(): BelongsTo
-    {
-        return $this->belongsTo(Organization::class);
-    }
 
     #[Scope]
     protected function search(Builder $query, string $term): void
@@ -90,39 +89,6 @@ final class User extends Authenticatable
     {
         return new Attribute(
             get: fn (): string => "$this->first_name $this->last_name",
-        );
-    }
-
-    /**
-     * The user's app role enum, read team-agnostically: ADMIN is a global
-     * assignment, MEMBER lives inside the organization's team, and Spatie's own
-     * hasRole() only sees the active team. Throws if the user has no role —
-     * a broken state that should surface loudly, not be papered over.
-     */
-    protected function appRole(): Attribute
-    {
-        return new Attribute(
-            get: function (): RoleEnum {
-                $role = Authorization::primaryRole($this);
-
-                throw_unless($role instanceof RoleEnum, RuntimeException::class, "User [{$this->id}] has no role assigned.");
-
-                return $role;
-            },
-        );
-    }
-
-    protected function isAdmin(): Attribute
-    {
-        return new Attribute(
-            get: fn (): bool => Authorization::userHasGlobalRole($this, RoleEnum::ADMIN),
-        );
-    }
-
-    protected function isMember(): Attribute
-    {
-        return new Attribute(
-            get: fn (): bool => Authorization::userHasRole($this, RoleEnum::MEMBER),
         );
     }
 

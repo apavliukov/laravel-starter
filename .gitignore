@@ -37,5 +37,3 @@ yarn-error.log
 # State file (don’t commit)
 .yarn/install-state.gz
 
-# boost:update artifacts, regenerated from composer.lock; overrides live in .ai/skills
-/.claude/skills/*

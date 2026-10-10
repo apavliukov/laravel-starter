@@ -13,7 +13,7 @@ final readonly class ListUsersQuery
     /** @return LengthAwarePaginator<int, User> */
     public function handle(ListUsersFilters $filters): LengthAwarePaginator
     {
-        $query = User::query()->with('organization')->search($filters->search);
+        $query = User::query()->with('tenants')->search($filters->search);
 
         if ($filters->sort === 'name') {
             $query->orderBy('first_name', $filters->direction)

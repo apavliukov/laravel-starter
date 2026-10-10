@@ -14,16 +14,17 @@ declare(strict_types=1);
 
 namespace App\Models{
     /**
-     * The tenant: every member belongs to exactly one organization, and the
-     * organization is also the Spatie permissions team that scopes member roles.
+     * The tenant and the Spatie permissions team. Membership is a role held in
+     * this team (`members()` reads model_has_roles); a user may belong to several
+     * organizations. No membership column or pivot exists besides that.
      *
      * @property int $id
      * @property string $name
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
-     * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $users
-     * @property-read int|null $users_count
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $members
+     * @property-read int|null $members_count
      *
      * @method static \Database\Factories\OrganizationFactory factory($count = null, $state = [])
      * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newModelQuery()
@@ -47,6 +48,11 @@ namespace App\Models{
 
 namespace App\Models{
     /**
+     * Membership and identity come from the authorization package: `tenants()`
+     * lists the organizations the user holds a role in (model_has_roles.team_id),
+     * `app_role` / `is_platform_admin` read roles team-agnostically. Never
+     * hasRole() — Spatie only sees the active team.
+     *
      * @property int $id
      * @property string $first_name
      * @property string $last_name
@@ -58,20 +64,20 @@ namespace App\Models{
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property int|null $organization_id
-     * @property-read \App\Enums\Policies\Role $app_role
+     * @property-read \AlexPavliukov\Authorization\Contracts\AuthorizationRole|null $app_role
      * @property-read string $initials
-     * @property-read bool $is_admin
-     * @property-read bool $is_member
+     * @property-read bool $is_platform_admin
      * @property-read string $name
      * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
      * @property-read int|null $notifications_count
-     * @property-read Organization|null $organization
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
      * @property-read int|null $permissions_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
      * @property-read int|null $roles_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, Organization> $teams
      * @property-read int|null $teams_count
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, Organization> $tenants
+     * @property-read int|null $tenants_count
      *
      * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
      * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()

@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Organizations;
 use AlexPavliukov\Authorization\Enums\Ability;
 use App\Actions\Organizations\DeleteOrganization as DeleteOrganizationAction;
 use App\Models\Organization;
+use DomainException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
@@ -27,7 +28,14 @@ final class DeleteOrganization extends Component
     {
         Gate::authorize(Ability::DELETE, $this->organization);
 
-        $action($this->organization);
+        try {
+            $action($this->organization);
+        } catch (DomainException $exception) {
+            self::modal($this->modalName)->close();
+            $this->dispatch('toast', message: $exception->getMessage(), variant: 'error');
+
+            return;
+        }
 
         self::modal($this->modalName)->close();
 

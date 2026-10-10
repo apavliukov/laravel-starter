@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use AlexPavliukov\Authorization\Authorization;
 use AlexPavliukov\Authorization\Tenancy\TenantMembership;
 use App\Enums\Policies\Role as RoleEnum;
 use App\Models\Organization;
@@ -24,7 +23,6 @@ final class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'organization_id' => null,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
@@ -39,23 +37,22 @@ final class UserFactory extends Factory
         return $this->state(fn (): array => ['email_verified_at' => null]);
     }
 
-    public function forOrganization(Organization $organization): self
+    /**
+     * Super-admin roles are global; every other role is a membership in an
+     * organization, created on the fly when none is given.
+     */
+    public function withRole(RoleEnum $role, ?Organization $organization = null): self
     {
-        return $this->state(fn (): array => ['organization_id' => $organization->id]);
-    }
+        return $this->afterCreating(function (User $user) use ($role, $organization): void {
+            $membership = resolve(TenantMembership::class);
 
-    /** ADMIN is a global assignment; every other role lives in the user's organization team. */
-    public function withRole(RoleEnum $role): self
-    {
-        return $this->afterCreating(function (User $user) use ($role): void {
             if ($role->isSuperAdmin()) {
-                Authorization::withTeam(null, static fn (): User => $user->assignRole($role));
-                Authorization::forgetUserRoles($user);
+                $membership->assignGlobal($user, $role);
 
                 return;
             }
 
-            resolve(TenantMembership::class)->add($user, $user->organization_id, $role);
+            $membership->add($user, $organization ?? Organization::factory()->create(), $role);
         });
     }
 
@@ -64,13 +61,8 @@ final class UserFactory extends Factory
         return $this->withRole(RoleEnum::ADMIN);
     }
 
-    /** Creates an organization when none was given — a member without one is an invalid state. */
     public function member(?Organization $organization = null): self
     {
-        return $this
-            ->state(fn (array $attributes): array => [
-                'organization_id' => $organization?->id ?? $attributes['organization_id'] ?? Organization::factory(),
-            ])
-            ->withRole(RoleEnum::MEMBER);
+        return $this->withRole(RoleEnum::MEMBER, $organization);
     }
 }

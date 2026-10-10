@@ -9,10 +9,9 @@ use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])
-    ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
-        Route::get('/', DashboardController::class)
+        Route::get('/dashboard', DashboardController::class)
             ->name('dashboard');
 
         Route::prefix('settings')
@@ -29,11 +28,13 @@ Route::middleware(['auth', 'verified'])
                     ->name('appearance');
             });
 
-        Route::name('platform.')
+        Route::prefix('platform')
+            ->name('platform.')
             ->middleware(EnsurePlatformArea::class)
             ->group(base_path('routes/admin/platform.php'));
 
-        Route::name('member.')
+        Route::prefix('admin')
+            ->name('member.')
             ->middleware(EnsureTenantSelected::class)
             ->group(base_path('routes/admin/member.php'));
     });

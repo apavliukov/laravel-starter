@@ -57,7 +57,7 @@ final class EditUserTest extends TestCase
             ->set('form.first_name', 'New')
             ->set('form.email', 'new@example.test')
             ->set('form.password', 'fresh-pass')
-            ->set('form.role', Role::ADMIN->value)
+            ->set('form.is_platform_admin', true)
             ->call('update')
             ->assertHasNoErrors();
 
@@ -66,6 +66,7 @@ final class EditUserTest extends TestCase
         $this->assertSame('new@example.test', $target->email);
         $this->assertTrue(Hash::check('fresh-pass', $target->password));
         $this->assertSame(Role::ADMIN, $target->app_role);
+        $this->assertTrue($target->is_platform_admin);
     }
 
     #[Test]

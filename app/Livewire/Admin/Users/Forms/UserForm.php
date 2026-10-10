@@ -6,11 +6,14 @@ namespace App\Livewire\Admin\Users\Forms;
 
 use App\Dto\Users\CreateUserInput;
 use App\Dto\Users\UpdateUserInput;
-use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Livewire\Form;
 
+/**
+ * Identity plus the one global role. Organization memberships are edited on
+ * the organization (OrganizationMemberList), never here.
+ */
 final class UserForm extends Form
 {
     public string $first_name = '';
@@ -21,9 +24,7 @@ final class UserForm extends Form
 
     public string $password = '';
 
-    public string $role = '';
-
-    public ?int $organization_id = null;
+    public bool $is_platform_admin = false;
 
     public ?int $ignoreUserId = null;
 
@@ -34,8 +35,7 @@ final class UserForm extends Form
         $this->first_name = $user->first_name ?? '';
         $this->last_name = $user->last_name ?? '';
         $this->email = $user->email ?? '';
-        $this->role = $user->appRole->value;
-        $this->organization_id = $user->organization_id;
+        $this->is_platform_admin = $user->is_platform_admin;
     }
 
     /**
@@ -54,13 +54,7 @@ final class UserForm extends Form
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', $emailRule],
             'password' => [$this->passwordRequired ? 'required' : 'nullable', 'string', 'min:8'],
-            'role' => ['required', Rule::enum(Role::class)],
-            'organization_id' => [
-                Rule::requiredIf(fn (): bool => ! (Role::tryFrom($this->role)?->isSuperAdmin() ?? true)),
-                'nullable',
-                'integer',
-                Rule::exists('organizations', 'id')->whereNull('deleted_at'),
-            ],
+            'is_platform_admin' => ['boolean'],
         ];
     }
 
@@ -71,8 +65,7 @@ final class UserForm extends Form
             lastName: $this->last_name,
             email: $this->email,
             password: $this->password,
-            role: Role::from($this->role),
-            organizationId: $this->organization_id,
+            platformAdmin: $this->is_platform_admin,
         );
     }
 
@@ -83,8 +76,7 @@ final class UserForm extends Form
             lastName: $this->last_name,
             email: $this->email,
             password: $this->password === '' ? null : $this->password,
-            role: Role::from($this->role),
-            organizationId: $this->organization_id,
+            platformAdmin: $this->is_platform_admin,
         );
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Dto\Users;
 
 use App\Dto\Users\UpdateUserInput;
-use App\Enums\Policies\Role;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -24,11 +23,9 @@ final class UpdateUserInputTest extends TestCase
             'last_name' => 'Cooper',
             'email' => 'a@b.test',
             'password' => 'new-pass',
-            'role' => 'member',
         ]);
 
         $this->assertSame('new-pass', $dto->password);
-        $this->assertSame(Role::MEMBER, $dto->role);
     }
 
     #[Test]
@@ -39,7 +36,6 @@ final class UpdateUserInputTest extends TestCase
             'last_name' => 'Cooper',
             'email' => 'a@b.test',
             'password' => '',
-            'role' => 'member',
         ]);
 
         $this->assertNull($dto->password);
@@ -52,7 +48,6 @@ final class UpdateUserInputTest extends TestCase
             'first_name' => 'Alice',
             'last_name' => 'Cooper',
             'email' => 'a@b.test',
-            'role' => 'member',
         ]);
 
         $this->assertNull($dto->password);

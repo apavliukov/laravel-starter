@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Admin\Users;
 
+use AlexPavliukov\Authorization\Tenancy\TenantMembership;
 use App\Enums\Policies\Role;
 use App\Livewire\Admin\Users\CreateUser;
-use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -43,10 +43,9 @@ final class CreateUserTest extends TestCase
     }
 
     #[Test]
-    public function admin_can_create_a_user(): void
+    public function admin_can_create_a_user_without_any_role(): void
     {
         $admin = User::factory()->admin()->create();
-        $organization = Organization::factory()->create();
         $this->actingAs($admin);
 
         Livewire::test(CreateUser::class)
@@ -54,8 +53,6 @@ final class CreateUserTest extends TestCase
             ->set('form.last_name', 'Cooper')
             ->set('form.email', 'alice@example.test')
             ->set('form.password', 'secret-pass')
-            ->set('form.role', Role::MEMBER->value)
-            ->set('form.organization_id', $organization->id)
             ->call('store')
             ->assertHasNoErrors()
             ->assertRedirect();
@@ -63,12 +60,12 @@ final class CreateUserTest extends TestCase
         $created = User::query()->where('email', 'alice@example.test')->firstOrFail();
         $this->assertSame('Alice', $created->first_name);
         $this->assertTrue(Hash::check('secret-pass', $created->password));
-        $this->assertSame(Role::MEMBER, $created->app_role);
-        $this->assertSame($organization->id, $created->organization_id);
+        $this->assertNull($created->app_role);
+        $this->assertSame([], resolve(TenantMembership::class)->tenantIdsOf($created));
     }
 
     #[Test]
-    public function validation_requires_an_organization_for_members(): void
+    public function admin_can_create_a_platform_admin(): void
     {
         $admin = User::factory()->admin()->create();
         $this->actingAs($admin);
@@ -78,9 +75,13 @@ final class CreateUserTest extends TestCase
             ->set('form.last_name', 'Cooper')
             ->set('form.email', 'alice@example.test')
             ->set('form.password', 'secret-pass')
-            ->set('form.role', Role::MEMBER->value)
+            ->set('form.is_platform_admin', true)
             ->call('store')
-            ->assertHasErrors(['form.organization_id']);
+            ->assertHasNoErrors();
+
+        $created = User::query()->where('email', 'alice@example.test')->firstOrFail();
+        $this->assertSame(Role::ADMIN, $created->app_role);
+        $this->assertTrue($created->is_platform_admin);
     }
 
     #[Test]
@@ -90,14 +91,12 @@ final class CreateUserTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(CreateUser::class)
-            ->set('form.role', '')
             ->call('store')
             ->assertHasErrors([
                 'form.first_name',
                 'form.last_name',
                 'form.email',
                 'form.password',
-                'form.role',
             ]);
     }
 
@@ -113,7 +112,6 @@ final class CreateUserTest extends TestCase
             ->set('form.last_name', 'B')
             ->set('form.email', 'taken@example.test')
             ->set('form.password', 'secret-pass')
-            ->set('form.role', Role::MEMBER->value)
             ->call('store')
             ->assertHasErrors(['form.email']);
     }

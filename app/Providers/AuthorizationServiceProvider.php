@@ -12,9 +12,9 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * Tenancy itself is configured in config/authorization.php (Organization is the
- * tenant and the Spatie team, resolved from users.organization_id). The package
- * registers the deny-all SystemAbility::ACCESS_PLATFORM_ADMIN gate once tenancy
- * is on; only the super-admin bypass can satisfy it.
+ * tenant and the Spatie team; membership is a role in model_has_roles). The
+ * package registers the deny-all SystemAbility::ACCESS_PLATFORM_ADMIN gate; only
+ * the super-admin bypass can satisfy it.
  */
 final class AuthorizationServiceProvider extends ServiceProvider
 {

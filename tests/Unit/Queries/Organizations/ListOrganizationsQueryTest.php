@@ -28,7 +28,7 @@ final class ListOrganizationsQueryTest extends TestCase
         $result = new ListOrganizationsQuery()->handle(new ListOrganizationsFilters(search: 'acm'));
 
         $this->assertSame(1, $result->total());
-        $this->assertSame(2, $result->getCollection()->first()?->users_count);
+        $this->assertSame(2, $result->getCollection()->first()?->members_count);
     }
 
     #[Test]

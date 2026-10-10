@@ -37,6 +37,25 @@ final class DeleteOrganizationTest extends TestCase
     }
 
     #[Test]
+    public function admin_cannot_delete_an_organization_with_members(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $organization = Organization::factory()->create();
+        User::factory()->member($organization)->create();
+        $this->actingAs($admin);
+
+        Livewire::test(DeleteOrganization::class, [
+            'organization' => $organization,
+            'modalName' => 'delete-organization-'.$organization->id,
+        ])
+            ->call('delete')
+            ->assertNoRedirect()
+            ->assertDispatched('toast', variant: 'error');
+
+        $this->assertDatabaseHas('organizations', ['id' => $organization->id, 'deleted_at' => null]);
+    }
+
+    #[Test]
     public function member_cannot_delete_an_organization(): void
     {
         $organization = Organization::factory()->create();

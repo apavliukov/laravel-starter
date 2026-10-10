@@ -85,7 +85,7 @@
                                     </flux:link>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <flux:text class="text-sm">{{ $organization->users_count }}</flux:text>
+                                    <flux:text class="text-sm">{{ $organization->members_count }}</flux:text>
                                 </td>
                                 <td class="px-6 py-4">
                                     <flux:text class="text-sm" title="{{ $organization->created_at->smartDateTime() }}">

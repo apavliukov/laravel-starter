@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Dto\Users;
 
-use App\Enums\Policies\Role;
-
 final readonly class CreateUserInput
 {
     public function __construct(
@@ -13,8 +11,7 @@ final readonly class CreateUserInput
         public string $lastName,
         public string $email,
         public string $password,
-        public Role $role,
-        public ?int $organizationId = null,
+        public bool $platformAdmin = false,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -25,8 +22,7 @@ final readonly class CreateUserInput
             lastName: $data['last_name'],
             email: $data['email'],
             password: $data['password'],
-            role: Role::from($data['role']),
-            organizationId: isset($data['organization_id']) ? (int) $data['organization_id'] : null,
+            platformAdmin: (bool) ($data['is_platform_admin'] ?? false),
         );
     }
 }

@@ -20,7 +20,7 @@ use Tests\TestCase;
 final class CreateUserTest extends TestCase
 {
     #[Test]
-    public function creates_user_with_hashed_password_and_role(): void
+    public function creates_user_with_hashed_password_and_global_admin_role(): void
     {
         $action = $this->app->make(CreateUser::class);
 
@@ -29,7 +29,7 @@ final class CreateUserTest extends TestCase
             lastName: 'Cooper',
             email: 'alice@example.test',
             password: 'plain-pass',
-            role: Role::ADMIN,
+            platformAdmin: true,
         ));
 
         $this->assertInstanceOf(User::class, $user);
@@ -39,5 +39,22 @@ final class CreateUserTest extends TestCase
         $this->assertNotSame('plain-pass', $user->password);
         $this->assertTrue(Hash::check('plain-pass', $user->password));
         $this->assertSame(Role::ADMIN, $user->app_role);
+        $this->assertTrue($user->is_platform_admin);
+    }
+
+    #[Test]
+    public function creates_a_user_without_any_role_by_default(): void
+    {
+        $action = $this->app->make(CreateUser::class);
+
+        $user = $action(new CreateUserInput(
+            firstName: 'Alice',
+            lastName: 'Cooper',
+            email: 'alice@example.test',
+            password: 'plain-pass',
+        ));
+
+        $this->assertNull($user->app_role);
+        $this->assertFalse($user->is_platform_admin);
     }
 }

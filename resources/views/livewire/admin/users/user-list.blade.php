@@ -90,12 +90,16 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <flux:badge :color="$user->app_role->badgeColor()" size="sm">
-                                        {{ $user->app_role->label() }}
-                                    </flux:badge>
+                                    @if ($user->app_role)
+                                        <flux:badge :color="$user->app_role->badgeColor()" size="sm">
+                                            {{ $user->app_role->label() }}
+                                        </flux:badge>
+                                    @else
+                                        <flux:text class="text-sm">—</flux:text>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
-                                    <flux:text class="text-sm">{{ $user->organization?->name ?? '—' }}</flux:text>
+                                    <flux:text class="text-sm">{{ $user->tenants->pluck('name')->join(', ') ?: '—' }}</flux:text>
                                 </td>
                                 <td class="px-6 py-4">
                                     <flux:text class="text-sm" title="{{ $user->created_at->smartDateTime() }}">

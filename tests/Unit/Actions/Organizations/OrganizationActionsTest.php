@@ -10,6 +10,8 @@ use App\Actions\Organizations\UpdateOrganization;
 use App\Dto\Organizations\CreateOrganizationInput;
 use App\Dto\Organizations\UpdateOrganizationInput;
 use App\Models\Organization;
+use App\Models\User;
+use DomainException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -39,6 +41,17 @@ final class OrganizationActionsTest extends TestCase
         $updated = resolve(UpdateOrganization::class)($organization, new UpdateOrganizationInput(name: 'New'));
 
         $this->assertSame('New', $updated->name);
+    }
+
+    #[Test]
+    public function refuses_to_delete_an_organization_with_members(): void
+    {
+        $organization = Organization::factory()->create();
+        User::factory()->member($organization)->create();
+
+        $this->expectException(DomainException::class);
+
+        resolve(DeleteOrganization::class)($organization);
     }
 
     #[Test]

@@ -1,5 +1,7 @@
 @php
-    $role = auth()->user()->app_role;
+    use App\Enums\Policies\Role;
+
+    $role = auth()->user()->app_role ?? Role::default();
     $layoutType = $role->layout();
     $menu = "admin.$layoutType.navigation.menu";
 @endphp

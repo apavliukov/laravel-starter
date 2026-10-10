@@ -5,5 +5,5 @@ paths:
 
 # Admin
 
-## Area gates are the package tenancy middleware
-Neither group adds a URL prefix: routes/admin/platform.php serves /admin/users, not /admin/platform/users. The platform group runs under AlexPavliukov\Authorization\Tenancy\EnsurePlatformArea (deny-all accessPlatformAdmin gate + request-wide tenant bypass); the member group under EnsureTenantSelected (403 without an organization). Do not write app-side gate middleware — attach one of these two to every new group, and never leave a group ungated.
+## Area URLs: /platform for platform, /admin for members; names keep admin.{area}.
+Route names carry admin.{area}., URLs follow oohire: routes/admin/platform.php is served at /platform/* (EnsurePlatformArea: deny-all accessPlatformAdmin gate + request-wide tenant bypass), routes/admin/member.php at /admin/* (EnsureTenantSelected: 403 without an organization); dashboard and settings are area-less at /dashboard and /settings/*. Do not write app-side gate middleware — attach one of the two package middlewares to every new group, never leave a group ungated. authorization.areas matches on route names, so never rename the admin.platform./admin.member. prefixes.
