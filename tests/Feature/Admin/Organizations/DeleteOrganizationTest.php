@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Admin\Organizations;
 
+use AlexPavliukov\Authorization\Tenancy\TenantMembership;
 use App\Livewire\Admin\Organizations\DeleteOrganization;
 use App\Models\Organization;
 use App\Models\User;
@@ -37,11 +38,11 @@ final class DeleteOrganizationTest extends TestCase
     }
 
     #[Test]
-    public function admin_cannot_delete_an_organization_with_members(): void
+    public function admin_archives_an_organization_with_members_and_their_memberships_stay(): void
     {
         $admin = User::factory()->admin()->create();
         $organization = Organization::factory()->create();
-        User::factory()->member($organization)->create();
+        $member = User::factory()->member($organization)->create();
         $this->actingAs($admin);
 
         Livewire::test(DeleteOrganization::class, [
@@ -49,10 +50,10 @@ final class DeleteOrganizationTest extends TestCase
             'modalName' => 'delete-organization-'.$organization->id,
         ])
             ->call('delete')
-            ->assertNoRedirect()
-            ->assertDispatched('toast', variant: 'error');
+            ->assertRedirect(route('admin.platform.organizations.index'));
 
-        $this->assertDatabaseHas('organizations', ['id' => $organization->id, 'deleted_at' => null]);
+        $this->assertSoftDeleted('organizations', ['id' => $organization->id]);
+        $this->assertSame([$organization->id], resolve(TenantMembership::class)->tenantIdsOf($member));
     }
 
     #[Test]

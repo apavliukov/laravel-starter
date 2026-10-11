@@ -1,9 +1,7 @@
 @php
-    use App\Enums\Policies\Role;
+    use App\Support\Areas\CurrentLayout;
 
-    $role = auth()->user()->app_role ?? Role::default();
-    $layoutType = $role->layout();
-    $layout = "admin.dashboard.$layoutType";
+    $layout = 'admin.dashboard.'.resolve(CurrentLayout::class)->name();
 @endphp
 
 <x-dynamic-component :component="$layout" />

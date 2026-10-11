@@ -7,12 +7,15 @@ namespace App\Livewire\Admin\Users;
 use AlexPavliukov\Authorization\Enums\Ability;
 use App\Actions\Users\DeleteUser as DeleteUserAction;
 use App\Models\User;
+use App\Traits\Livewire\ShowsDomainRefusals;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
 final class DeleteUser extends Component
 {
+    use ShowsDomainRefusals;
+
     public User $user;
 
     public string $modalName;
@@ -27,9 +30,9 @@ final class DeleteUser extends Component
     {
         Gate::authorize(Ability::DELETE, $this->user);
 
-        $action($this->user);
-
         self::modal($this->modalName)->close();
+
+        $action($this->user);
 
         session()?->flash('toast', [
             'message' => __('User deleted successfully'),

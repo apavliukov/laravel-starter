@@ -123,23 +123,31 @@
                                                 @endcan
                                                 @can(Ability::DELETE, $user)
                                                     <flux:menu.separator />
-                                                    <flux:modal.trigger :name="'delete-user-'.$user->id">
-                                                        <flux:menu.item variant="danger" icon="trash">
+                                                    @if ($user->owned_organizations_count > 0)
+                                                        <flux:menu.item variant="danger" icon="trash" disabled>
                                                             {{ __('Delete') }}
                                                         </flux:menu.item>
-                                                    </flux:modal.trigger>
+                                                    @else
+                                                        <flux:modal.trigger :name="'delete-user-'.$user->id">
+                                                            <flux:menu.item variant="danger" icon="trash">
+                                                                {{ __('Delete') }}
+                                                            </flux:menu.item>
+                                                        </flux:modal.trigger>
+                                                    @endif
                                                 @endcan
                                             </flux:menu>
                                         </flux:dropdown>
                                     @endcanany
 
-                                    @can(Ability::DELETE, $user)
-                                        <livewire:admin.users.delete-user
-                                            :user="$user"
-                                            :modal-name="'delete-user-'.$user->id"
-                                            wire:key="delete-user-{{ $user->id }}"
-                                        />
-                                    @endcan
+                                    @if ($user->owned_organizations_count === 0)
+                                        @can(Ability::DELETE, $user)
+                                            <livewire:admin.users.delete-user
+                                                :user="$user"
+                                                :modal-name="'delete-user-'.$user->id"
+                                                wire:key="delete-user-{{ $user->id }}"
+                                            />
+                                        @endcan
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

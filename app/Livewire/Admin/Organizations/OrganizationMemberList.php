@@ -8,9 +8,12 @@ use AlexPavliukov\Authorization\Enums\Ability;
 use AlexPavliukov\Authorization\Tenancy\TenantMembership;
 use App\Actions\Organizations\AddOrganizationMember;
 use App\Actions\Organizations\RemoveOrganizationMember;
+use App\Actions\Organizations\TransferOrganizationOwnership;
+use App\Enums\Policies\OrganizationAbility;
 use App\Enums\Policies\Role;
 use App\Models\Organization;
 use App\Models\User;
+use App\Traits\Livewire\ShowsDomainRefusals;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -18,8 +21,11 @@ use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
+/** Memberships are managed here, on the organization; the owner's row is read-only until ownership is transferred. */
 final class OrganizationMemberList extends Component
 {
+    use ShowsDomainRefusals;
+
     public Organization $organization;
 
     public string $email = '';
@@ -32,18 +38,29 @@ final class OrganizationMemberList extends Component
         $this->role = Role::default()->value;
     }
 
-    /** @return array<int, Role> */
+    /**
+     * Roles a membership can be given: never a global role, never OWNER (derived from owner_id).
+     *
+     * @return array<int, Role>
+     */
     #[Computed]
     public function roleOptions(): array
     {
-        return array_values(array_filter(Role::cases(), static fn (Role $role): bool => ! $role->isSuperAdmin()));
+        return array_values(array_filter(
+            Role::cases(),
+            static fn (Role $role): bool => ! $role->isSuperAdmin() && $role !== Role::OWNER,
+        ));
     }
 
     /** @return Collection<int, User> */
     #[Computed]
     public function members(): Collection
     {
-        return $this->organization->members()->orderBy('first_name')->orderBy('last_name')->get();
+        /** @var Collection<int, User> */
+        return $this->organization->members()
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
     }
 
     public function roleOf(User $user): ?Role
@@ -51,6 +68,11 @@ final class OrganizationMemberList extends Component
         $name = resolve(TenantMembership::class)->roleFor($user, $this->organization);
 
         return $name === null ? null : Role::tryFrom($name);
+    }
+
+    public function isOwner(User $user): bool
+    {
+        return $this->organization->owner()->is($user);
     }
 
     public function add(AddOrganizationMember $action): void
@@ -95,6 +117,17 @@ final class OrganizationMemberList extends Component
         unset($this->members);
 
         $this->dispatch('toast', message: __('Member removed'), variant: 'success');
+    }
+
+    public function transferOwnership(int $userId, TransferOrganizationOwnership $action): void
+    {
+        Gate::authorize(OrganizationAbility::TRANSFER_OWNERSHIP, $this->organization);
+
+        $action($this->organization, $this->member($userId));
+
+        unset($this->members);
+
+        $this->dispatch('toast', message: __('Ownership transferred'), variant: 'success');
     }
 
     public function render(): View

@@ -28,16 +28,33 @@ final class RoleTest extends TestCase
     }
 
     #[Test]
-    public function member_is_not_super_admin(): void
+    public function owner_and_member_are_not_super_admins(): void
     {
+        $this->assertFalse(Role::OWNER->isSuperAdmin());
         $this->assertFalse(Role::MEMBER->isSuperAdmin());
     }
 
     #[Test]
-    public function roles_grant_no_extra_permissions_by_default(): void
+    public function by_priority_ranks_every_case_exactly_once(): void
+    {
+        $this->assertSame([Role::ADMIN, Role::OWNER, Role::MEMBER], Role::byPriority());
+        $this->assertEqualsCanonicalizing(Role::cases(), Role::byPriority());
+    }
+
+    #[Test]
+    public function admin_and_member_grant_no_permissions(): void
     {
         $this->assertSame([], Role::ADMIN->permissions());
         $this->assertSame([], Role::MEMBER->permissions());
+    }
+
+    #[Test]
+    public function owner_holds_the_organization_set_including_ownership_transfer(): void
+    {
+        $this->assertEqualsCanonicalizing(
+            ['view organizations', 'update organizations', 'transfer ownership organizations'],
+            Role::OWNER->permissions(),
+        );
     }
 
     #[Test]
@@ -47,8 +64,9 @@ final class RoleTest extends TestCase
     }
 
     #[Test]
-    public function member_uses_the_member_layout(): void
+    public function owner_and_member_use_the_member_layout(): void
     {
+        $this->assertSame('member', Role::OWNER->layout());
         $this->assertSame('member', Role::MEMBER->layout());
     }
 
@@ -56,6 +74,7 @@ final class RoleTest extends TestCase
     public function each_role_exposes_a_badge_color(): void
     {
         $this->assertSame('red', Role::ADMIN->badgeColor());
+        $this->assertSame('amber', Role::OWNER->badgeColor());
         $this->assertSame('zinc', Role::MEMBER->badgeColor());
     }
 }

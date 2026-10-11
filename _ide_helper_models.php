@@ -18,6 +18,9 @@ namespace App\Models{
      * this team (`members()` reads model_has_roles); a user may belong to several
      * organizations. No membership column or pivot exists besides that.
      *
+     * Ownership is `owner_id` and nothing else; it is not fillable and changes only
+     * through `TenantMembership::transferOwnership()`.
+     *
      * @property int $id
      * @property string $name
      * @property \Illuminate\Support\Carbon|null $created_at
@@ -25,6 +28,7 @@ namespace App\Models{
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $members
      * @property-read int|null $members_count
+     * @property-read User|null $owner
      *
      * @method static \Database\Factories\OrganizationFactory factory($count = null, $state = [])
      * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newModelQuery()
@@ -70,6 +74,8 @@ namespace App\Models{
      * @property-read string $name
      * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
      * @property-read int|null $notifications_count
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, Organization> $ownedOrganizations
+     * @property-read int|null $owned_organizations_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
      * @property-read int|null $permissions_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles

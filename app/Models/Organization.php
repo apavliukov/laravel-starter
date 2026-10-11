@@ -6,6 +6,7 @@ namespace App\Models;
 
 use AlexPavliukov\Authorization\Concerns\HasPolicy;
 use AlexPavliukov\Authorization\Tenancy\Concerns\HasMembers;
+use App\Enums\Policies\OrganizationAbility;
 use App\Traits\Models\HasRelationTypeName;
 use Database\Factories\OrganizationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -20,6 +21,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * this team (`members()` reads model_has_roles); a user may belong to several
  * organizations. No membership column or pivot exists besides that.
  *
+ * Ownership is `owner_id` and nothing else; it is not fillable and changes only
+ * through `TenantMembership::transferOwnership()`.
+ *
  * @mixin IdeHelperOrganization
  */
 #[Fillable([
@@ -33,6 +37,12 @@ final class Organization extends Model
     use HasPolicy;
     use HasRelationTypeName;
     use SoftDeletes;
+
+    /** @return array<int, OrganizationAbility> */
+    public static function getCustomAbilities(): array
+    {
+        return OrganizationAbility::cases();
+    }
 
     #[Scope]
     protected function search(Builder $query, string $term): void

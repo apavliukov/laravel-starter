@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Enums\Policies;
 
 use AlexPavliukov\Authorization\Contracts\AuthorizationRole;
+use AlexPavliukov\Authorization\Enums\Ability;
+use AlexPavliukov\Authorization\Support\Permissions;
 use App\Contracts\Enums\HasLabelsInterface;
 use App\Contracts\Enums\StringMatchInterface;
+use App\Models\Organization;
 use App\Support\Roles\HasRolePresentation;
 use App\Traits\Enums\HasLabels;
 use App\Traits\Enums\HasValues;
@@ -20,11 +23,23 @@ enum Role: string implements AuthorizationRole, HasLabelsInterface, StringMatchI
     use HasValues;
 
     case ADMIN = 'admin';
+    case OWNER = 'owner';
     case MEMBER = 'member';
 
     public static function default(): self
     {
         return self::MEMBER;
+    }
+
+    /**
+     * Highest first: decides `$user->app_role` (landing page, role badge) for a user
+     * holding several roles. A product decision, not a permission count.
+     *
+     * @return list<self>
+     */
+    public static function byPriority(): array
+    {
+        return [self::ADMIN, self::OWNER, self::MEMBER];
     }
 
     public static function fromString(string $value): ?self
@@ -44,6 +59,7 @@ enum Role: string implements AuthorizationRole, HasLabelsInterface, StringMatchI
     {
         return match ($this) {
             self::ADMIN => __('Admin'),
+            self::OWNER => __('Owner'),
             self::MEMBER => __('Member'),
         };
     }
@@ -52,15 +68,25 @@ enum Role: string implements AuthorizationRole, HasLabelsInterface, StringMatchI
     {
         return match ($this) {
             self::ADMIN => true,
-            self::MEMBER => false,
+            self::OWNER, self::MEMBER => false,
         };
     }
 
-    /** @return array<int, string> */
+    /**
+     * ADMIN is the super-admin bypass. OWNER is the organization's full set — every
+     * lower organization role's grants plus ownership transfer (concentric roles are
+     * a convention of this app, not a package rule). MEMBER's empty array is an
+     * active deny-all.
+     *
+     * @return array<int, string>
+     */
     public function permissions(): array
     {
         return match ($this) {
             self::ADMIN, self::MEMBER => [],
+            self::OWNER => Permissions::make()
+                ->for(Organization::class)->only(Ability::VIEW, Ability::UPDATE, OrganizationAbility::TRANSFER_OWNERSHIP)
+                ->all(),
         };
     }
 }

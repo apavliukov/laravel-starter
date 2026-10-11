@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Actions\Organizations;
 
+use AlexPavliukov\Authorization\Tenancy\OwnershipException;
 use AlexPavliukov\Authorization\Tenancy\TenantMembership;
 use App\Actions\Organizations\AddOrganizationMember;
 use App\Actions\Organizations\RemoveOrganizationMember;
@@ -44,6 +45,39 @@ final class OrganizationMembershipActionsTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         resolve(AddOrganizationMember::class)($organization, $user, Role::ADMIN);
+    }
+
+    #[Test]
+    public function refuses_the_owner_role_as_a_membership(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = User::factory()->create();
+
+        $this->expectException(OwnershipException::class);
+
+        resolve(AddOrganizationMember::class)($organization, $user, Role::OWNER);
+    }
+
+    #[Test]
+    public function refuses_to_demote_the_owner(): void
+    {
+        $owner = User::factory()->create();
+        $organization = Organization::factory()->ownedBy($owner)->create();
+
+        $this->expectException(OwnershipException::class);
+
+        resolve(AddOrganizationMember::class)($organization, $owner, Role::MEMBER);
+    }
+
+    #[Test]
+    public function refuses_to_remove_the_owner(): void
+    {
+        $owner = User::factory()->create();
+        $organization = Organization::factory()->ownedBy($owner)->create();
+
+        $this->assertThrows(static fn () => resolve(RemoveOrganizationMember::class)($organization, $owner), OwnershipException::class);
+
+        $this->assertSame(Role::OWNER->value, resolve(TenantMembership::class)->roleFor($owner, $organization));
     }
 
     #[Test]

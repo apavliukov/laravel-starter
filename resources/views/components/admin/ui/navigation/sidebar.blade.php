@@ -1,9 +1,7 @@
 @php
-    use App\Enums\Policies\Role;
+    use App\Support\Areas\CurrentLayout;
 
-    $role = auth()->user()->app_role ?? Role::default();
-    $layoutType = $role->layout();
-    $menu = "admin.$layoutType.navigation.menu";
+    $menu = 'admin.'.resolve(CurrentLayout::class)->name().'.navigation.menu';
 @endphp
 
 <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">

@@ -13,6 +13,7 @@ return new class extends Migration
         Schema::create('organizations', static function (Blueprint $blueprint): void {
             $blueprint->id();
             $blueprint->string('name');
+            $blueprint->foreignId('owner_id')->index()->constrained('users')->restrictOnDelete();
             $blueprint->timestamps();
             $blueprint->softDeletes();
         });

@@ -125,9 +125,12 @@ override `tenantKey(Model $model)` when the tenant is reached through a relation
 
 Role enum implements `AlexPavliukov\Authorization\Contracts\AuthorizationRole`:
 `label()`, `isSuperAdmin()`, `permissions()`. Keep `match($this)` arms exhaustive (no
-`default`) — forgetting a case throws `UnhandledMatchError` at seed time. **Order cases
-from most to least privileged** — `Authorization::primaryRole()` returns the first case
-the user holds.
+`default`) — forgetting a case throws `UnhandledMatchError` at seed time. **Add the new
+case to `byPriority()`** — `Authorization::primaryRole()` / `$user->app_role` return the
+first case there the user holds; declaration order is ignored, and sync throws a
+`LogicException` if a case is missing or repeated. The order is a product decision, not
+a permission count (oohire: `CANDIDATE` before `ORGANIZATION_ADMIN`, so an admin who is
+also a candidate lands in the candidate area).
 
 Build permission sets with the `Permissions` builder, never hand-written strings:
 
@@ -239,7 +242,17 @@ Middleware: `SetCurrentTenant` (priority before `SubstituteBindings`),
 **global** role; `RoleBypass` reads the global assignment regardless of the active team.
 
 Membership goes through `Tenancy\TenantMembership` (`add / changeRole / remove /
-roleFor / isMember / assignGlobal / removeEverywhere / tenantIdsOf`). Relations:
+roleFor / isMember / assignGlobal / removeGlobal / tenantIdsOf`); `tenancy.memberships
+=> 'single'` refuses a second tenant (`MembershipPolicyException`).
+
+Ownership (`tenancy.owner_role` set): the tenant's `owner_key` column (default
+`owner_id`, app migration NOT NULL + FK users) is the only record; the owner's role row
+is derived — `transferOwnership($tenant, $newOwner, $demoteTo = null)` writes both, also
+right after creating a tenant. `ownerOf / isOwner` and `HasMembers::owner()` read the
+column; it never grants access. Editing the owner's membership, granting the owner role,
+or deleting an owner throws `OwnershipException`. `AuthorizationSeeder` /
+`authorization:repair-ownership` re-derive owner rows. Archive tenants (soft delete);
+never hard-delete. Relations:
 `Tenancy\Concerns\HasMembers` on the tenant (`members()`), `HasTenantMemberships` on
 the user (`tenants()`), both morph relations through `model_has_roles`. Identity:
 `Concerns\HasAppRole` on the user — `$user->app_role` (highest role held anywhere),
@@ -269,7 +282,7 @@ Authorization::userRolesInTeam($user, $teamId);
 Authorization::withTeam($teamId, fn () => $user->can(Ability::UPDATE, $post));  // restored even on throw
 ```
 
-`Authorization::primaryRole($user)` — highest-priority role by enum declaration order,
+`Authorization::primaryRole($user)` — first role in the enum's `byPriority()` the user holds,
 team-agnostic; suits landing/redirect decisions.
 
 ### Request memoization

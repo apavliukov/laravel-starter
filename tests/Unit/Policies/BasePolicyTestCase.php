@@ -7,8 +7,10 @@ namespace Tests\Unit\Policies;
 use AlexPavliukov\Authorization\AbstractPolicy;
 use Tests\TestCase;
 
+/** @template TPolicy of AbstractPolicy */
 abstract class BasePolicyTestCase extends TestCase
 {
+    /** @var TPolicy */
     protected AbstractPolicy $policy;
 
     protected function setUp(): void
@@ -19,7 +21,7 @@ abstract class BasePolicyTestCase extends TestCase
     }
 
     /**
-     * @return class-string<AbstractPolicy>
+     * @return class-string<TPolicy>
      */
     abstract protected function getPolicyClass(): string;
 }

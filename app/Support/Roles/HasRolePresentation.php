@@ -10,7 +10,7 @@ trait HasRolePresentation
     {
         return match ($this) {
             self::ADMIN => 'platform',
-            self::MEMBER => 'member',
+            self::OWNER, self::MEMBER => 'member',
         };
     }
 
@@ -18,6 +18,7 @@ trait HasRolePresentation
     {
         return match ($this) {
             self::ADMIN => 'red',
+            self::OWNER => 'amber',
             self::MEMBER => 'zinc',
         };
     }

@@ -85,4 +85,17 @@ final class UserListTest extends TestCase
             ->assertSet('sort', 'created_at')
             ->assertSet('direction', 'desc');
     }
+
+    #[Test]
+    public function an_owner_row_offers_no_delete(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $owner = User::factory()->owner()->create();
+        $member = User::factory()->member()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(UserList::class)
+            ->assertDontSeeHtml('delete-user-'.$owner->id)
+            ->assertSeeHtml('delete-user-'.$member->id);
+    }
 }

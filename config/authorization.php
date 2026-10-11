@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Policies\Role;
 use App\Models\Organization;
 
 return [
@@ -34,6 +35,16 @@ return [
 
         // Route name EnsureTenantSelected redirects to when no tenant is active.
         'missing_tenant_redirect' => null,
+
+        // Ownership: organizations.owner_id (NOT NULL, FK users, restrictOnDelete) is
+        // the only record of the owner; the package derives the owner's OWNER role
+        // row from it and refuses to edit or delete the owner outside
+        // TenantMembership::transferOwnership().
+        'owner_key' => 'owner_id',
+        'owner_role' => Role::OWNER,
+
+        // A user may belong to several organizations; 'single' restricts to one.
+        'memberships' => 'multiple',
     ],
 
     /*

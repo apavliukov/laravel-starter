@@ -1,8 +1,15 @@
-@php use AlexPavliukov\Authorization\Enums\Ability; @endphp
+@php
+    use AlexPavliukov\Authorization\Enums\Ability;
+    use App\Enums\Policies\OrganizationAbility;
+    use Illuminate\Support\Facades\Gate;
+
+    $canUpdate = Gate::allows(Ability::UPDATE, $organization);
+    $canTransfer = Gate::allows(OrganizationAbility::TRANSFER_OWNERSHIP, $organization);
+@endphp
 <div class="space-y-6">
     <flux:heading size="lg">{{ __('Members') }}</flux:heading>
 
-    @can(Ability::UPDATE, $organization)
+    @if ($canUpdate)
         <form wire:submit="add" class="flex flex-wrap items-end gap-4">
             <flux:field class="w-full sm:w-72">
                 <flux:label>{{ __('Email') }}</flux:label>
@@ -22,7 +29,7 @@
 
             <flux:button type="submit" variant="primary" size="sm" icon="plus">{{ __('Add Member') }}</flux:button>
         </form>
-    @endcan
+    @endif
 
     @if ($this->members->isEmpty())
         <div class="rounded-lg border-2 border-dashed border-zinc-300 bg-zinc-50 p-8 text-center dark:border-zinc-600 dark:bg-zinc-800">
@@ -45,7 +52,10 @@
                 </thead>
                 <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
                     @foreach ($this->members as $member)
-                        @php $memberRole = $this->roleOf($member); @endphp
+                        @php
+                            $memberRole = $this->roleOf($member);
+                            $isOwner = $this->isOwner($member);
+                        @endphp
                         <tr wire:key="member-{{ $member->id }}">
                             <td class="px-6 py-4">
                                 <div class="flex flex-col gap-1">
@@ -62,7 +72,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                @can(Ability::UPDATE, $organization)
+                                @if (! $isOwner && $canUpdate)
                                     <flux:select
                                         size="sm"
                                         class="w-40"
@@ -78,19 +88,32 @@
                                         :color="$memberRole->badgeColor()"
                                         size="sm"
                                     >{{ $memberRole->label() }}</flux:badge>
-                                @endcan
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                @can(Ability::UPDATE, $organization)
-                                    <flux:button
-                                        wire:click="remove({{ $member->id }})"
-                                        wire:confirm="{{ __('Remove :name from :organization?', ['name' => $member->name, 'organization' => $organization->name]) }}"
-                                        variant="ghost"
-                                        size="sm"
-                                        icon="user-minus"
-                                        square
-                                    />
-                                @endcan
+                                @if (! $isOwner)
+                                    @if ($canTransfer)
+                                        <flux:button
+                                            wire:click="transferOwnership({{ $member->id }})"
+                                            wire:confirm="{{ __('Make :name the owner of :organization? The current owner becomes a member.', ['name' => $member->name, 'organization' => $organization->name]) }}"
+                                            variant="ghost"
+                                            size="sm"
+                                            icon="key"
+                                            square
+                                            :title="__('Make owner')"
+                                        />
+                                    @endif
+                                    @if ($canUpdate)
+                                        <flux:button
+                                            wire:click="remove({{ $member->id }})"
+                                            wire:confirm="{{ __('Remove :name from :organization?', ['name' => $member->name, 'organization' => $organization->name]) }}"
+                                            variant="ghost"
+                                            size="sm"
+                                            icon="user-minus"
+                                            square
+                                        />
+                                    @endif
+                                @endif
                             </td>
                         </tr>
                     @endforeach

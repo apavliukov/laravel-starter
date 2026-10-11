@@ -39,8 +39,7 @@ final readonly class UpdateUser
             }
 
             if (! $input->platformAdmin && $isPlatformAdmin) {
-                Authorization::withTeam(null, static fn (): User => $user->removeRole(Role::ADMIN->value));
-                Authorization::forgetUserRoles($user);
+                $this->membership->removeGlobal($user, Role::ADMIN);
             }
 
             return $user->refresh();

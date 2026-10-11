@@ -36,6 +36,24 @@ final class DeleteUserTest extends TestCase
     }
 
     #[Test]
+    public function an_organization_owner_cannot_be_deleted(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $owner = User::factory()->owner()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(DeleteUser::class, [
+            'user' => $owner,
+            'modalName' => 'delete-user-'.$owner->id,
+        ])
+            ->call('delete')
+            ->assertNoRedirect()
+            ->assertDispatched('toast', variant: 'error');
+
+        $this->assertDatabaseHas('users', ['id' => $owner->id, 'deleted_at' => null]);
+    }
+
+    #[Test]
     public function member_cannot_delete_a_user(): void
     {
         $member = User::factory()->member()->create();

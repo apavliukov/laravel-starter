@@ -134,6 +134,85 @@ final class OrganizationMemberListTest extends TestCase
     }
 
     #[Test]
+    public function the_owner_role_is_not_offered_as_a_membership(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $organization = Organization::factory()->create();
+        $user = User::factory()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(OrganizationMemberList::class, ['organization' => $organization])
+            ->assertSet('roleOptions', [Role::MEMBER])
+            ->set('email', $user->email)
+            ->set('role', Role::OWNER->value)
+            ->call('add')
+            ->assertHasErrors(['role']);
+    }
+
+    #[Test]
+    public function the_owner_cannot_be_removed_or_demoted(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $owner = User::factory()->create();
+        $organization = Organization::factory()->ownedBy($owner)->create();
+        $this->actingAs($admin);
+
+        Livewire::test(OrganizationMemberList::class, ['organization' => $organization])
+            ->call('remove', $owner->id)
+            ->assertDispatched('toast', variant: 'error')
+            ->call('changeRole', $owner->id, Role::MEMBER->value)
+            ->assertDispatched('toast', variant: 'error');
+
+        $this->assertSame(Role::OWNER->value, resolve(TenantMembership::class)->roleFor($owner, $organization));
+    }
+
+    #[Test]
+    public function admin_transfers_ownership_to_a_member(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $previous = User::factory()->create();
+        $organization = Organization::factory()->ownedBy($previous)->create();
+        $next = User::factory()->member($organization)->create();
+        $this->actingAs($admin);
+
+        Livewire::test(OrganizationMemberList::class, ['organization' => $organization])
+            ->call('transferOwnership', $next->id)
+            ->assertDispatched('toast', variant: 'success');
+
+        $membership = resolve(TenantMembership::class);
+
+        $this->assertTrue($membership->isOwner($next, $organization));
+        $this->assertSame(Role::MEMBER->value, $membership->roleFor($previous, $organization));
+    }
+
+    #[Test]
+    public function ownership_cannot_be_transferred_to_an_outsider(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $organization = Organization::factory()->create();
+        $outsider = User::factory()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(OrganizationMemberList::class, ['organization' => $organization])
+            ->call('transferOwnership', $outsider->id)
+            ->assertNotFound();
+
+        $this->assertFalse(resolve(TenantMembership::class)->isOwner($outsider, $organization));
+    }
+
+    #[Test]
+    public function member_cannot_transfer_ownership(): void
+    {
+        $organization = Organization::factory()->create();
+        $member = User::factory()->member($organization)->create();
+        $this->actingAs($member);
+
+        Livewire::test(OrganizationMemberList::class, ['organization' => $organization])
+            ->call('transferOwnership', $member->id)
+            ->assertForbidden();
+    }
+
+    #[Test]
     public function member_cannot_manage_memberships(): void
     {
         $organization = Organization::factory()->create();

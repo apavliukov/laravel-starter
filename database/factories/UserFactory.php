@@ -38,7 +38,8 @@ final class UserFactory extends Factory
     }
 
     /**
-     * Super-admin roles are global; every other role is a membership in an
+     * Super-admin roles are global; OWNER is held by owning an organization (created
+     * for the user when none is given); every other role is a membership in an
      * organization, created on the fly when none is given.
      */
     public function withRole(RoleEnum $role, ?Organization $organization = null): self
@@ -52,6 +53,18 @@ final class UserFactory extends Factory
                 return;
             }
 
+            if ($role === RoleEnum::OWNER && ! $organization instanceof Organization) {
+                Organization::factory()->ownedBy($user)->create();
+
+                return;
+            }
+
+            if ($role === RoleEnum::OWNER) {
+                $membership->transferOwnership($organization, $user);
+
+                return;
+            }
+
             $membership->add($user, $organization ?? Organization::factory()->create(), $role);
         });
     }
@@ -59,6 +72,11 @@ final class UserFactory extends Factory
     public function admin(): self
     {
         return $this->withRole(RoleEnum::ADMIN);
+    }
+
+    public function owner(?Organization $organization = null): self
+    {
+        return $this->withRole(RoleEnum::OWNER, $organization);
     }
 
     public function member(?Organization $organization = null): self

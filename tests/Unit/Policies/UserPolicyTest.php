@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 #[Group('policies')]
 #[Group('users')]
 #[CoversClass(UserPolicy::class)]
+/** @extends BasePolicyTestCase<UserPolicy> */
 final class UserPolicyTest extends BasePolicyTestCase
 {
     #[Test]

@@ -8,6 +8,7 @@ final readonly class CreateOrganizationInput
 {
     public function __construct(
         public string $name,
+        public string $ownerEmail,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -15,6 +16,7 @@ final readonly class CreateOrganizationInput
     {
         return new self(
             name: $data['name'],
+            ownerEmail: $data['owner_email'],
         );
     }
 }

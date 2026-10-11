@@ -37,7 +37,7 @@ Where the areas *are* materialized today: `components/admin/{platform,member}/na
 
 ## Tenancy: package layer, membership in `model_has_roles` (reference implementation)
 
-The canon tenancy layer from `apavliukov/laravel-authorization` ^1.2 — mechanics in the
+The canon tenancy layer from `apavliukov/laravel-authorization` ^1.3 — mechanics in the
 `laravel-authorization-development` skill, design history in the package's
 `docs/TENANCY-DESIGN.md` (§7 = this shape). App-side binding:
 
@@ -53,9 +53,22 @@ The canon tenancy layer from `apavliukov/laravel-authorization` ^1.2 — mechani
   the session choice (membership-validated), else the user's sole organization, else
   none (→ 403 on `admin.member.*`; a switcher behind `missing_tenant_redirect` is the
   app's job the day the member area exists). A platform admin may also hold memberships.
+- **Ownership = `organizations.owner_id`** (NOT NULL, FK users, `restrictOnDelete`) and
+  nothing else; the package derives the owner's `OWNER` role row from it
+  (`tenancy.owner_role`) and re-derives it on every deploy (`AuthorizationSeeder`). The
+  column grants no access, the OWNER role's enumerated set does. `owner_id` is not
+  fillable: `CreateOrganization` sets it once, after that only
+  `TransferOrganizationOwnership` (`TenantMembership::transferOwnership`, previous owner
+  becomes MEMBER) changes it, authorized by `OrganizationAbility::TRANSFER_OWNERSHIP`.
+  The package refuses to demote or remove the owner, to hand out OWNER through a
+  membership write, and to delete (soft or hard) a user who owns an organization; the
+  admin components turn the `DomainException` into an error toast through the
+  `ShowsDomainRefusals` Livewire hook, the users list
+  renders a disabled delete for owners (`owned_organizations_count`).
 - **UI split:** the user form edits identity plus the global ADMIN role
   (`is_platform_admin`); memberships and their roles are managed on the organization
-  (`OrganizationMemberList` on the edit page). `UpdateUser` never touches memberships.
+  (`OrganizationMemberList` on the edit page: owner row read-only with a transfer
+  button, every other row role select + remove). `UpdateUser` never touches memberships.
 - `SetCurrentTenant` is appended to `web` in `bootstrap/app.php`. **No tenant-owned model
   exists yet** — `tests/Feature/Tenancy/FailClosedScopeTest` is the reference for the
   fail-closed scope on an in-test model; the first domain model a project adds gets
@@ -64,8 +77,10 @@ The canon tenancy layer from `apavliukov/laravel-authorization` ^1.2 — mechani
 - `admin.dashboard` and `admin.settings.*` sit outside both areas: no bypass, tenant from
   the resolver. Fine while they touch no tenant-owned model; move them into an area the
   day they do.
-- An organization with members cannot be deleted (`DeleteOrganization` throws
-  `DomainException`; the component surfaces it as an error toast).
+- Organizations are **archived** (soft delete), never destroyed, members included:
+  memberships stay, members lose access because the resolver treats an archived
+  organization as gone. What happens to an archived organization's own records is a
+  per-project decision, not the template's.
 
 ### Stripping tenancy (projects without tenants)
 
@@ -73,21 +88,24 @@ Retrofitting tenancy is expensive, removing it is not — so the template ships 
 For a single-tenant project, do this once, right after seeding:
 
 1. `config/authorization.php`: `tenancy.model => null` — switches the whole package layer
-   off (scope, resolver, middleware registration). Keep the file for `areas`. The
-   `accessPlatformAdmin` deny-all gate stays registered by the package regardless.
+   off (scope, resolver, middleware registration, ownership). Keep the file for `areas`.
+   The `accessPlatformAdmin` deny-all gate stays registered by the package regardless.
 2. `config/permission.php`: `teams => false`, `models.team => null`.
 3. `bootstrap/app.php`: drop `SetCurrentTenant` from `web`.
 4. `routes/admin.php`: member group → no middleware (platform keeps `EnsurePlatformArea`,
    which is gate-only without tenancy).
 5. Delete `Organization` end to end: model, policy, factory, the `2026_08_22_204247`
-   migration, `app/{Actions,Dto,Queries}/Organizations/`,
+   migration, `app/{Actions,Dto,Queries}/Organizations/`, `OrganizationAbility`,
    `app/Livewire/Admin/Organizations/`, `OrganizationController`, the three view trees
    (`pages/admin/organizations`, `livewire/admin/organizations`,
    `components/admin/organizations`), the platform menu item, the `organizations.*` routes,
-   `tests/**/Organization*`, `tests/Feature/Tenancy/`.
-6. `User`: drop `HasTenantMemberships`; `UserFactory::member()` loses its argument and
-   assigns `MEMBER` globally; drop `Organization::class` from `authorizableModels()`.
-7. `DemoUserSeeder`: drop the organization and the `AddOrganizationMember` call.
+   `tests/**/Organization*`, `tests/Feature/Tenancy/`, `app/Support/Areas/` (sidebar and
+   dashboard then pick the layout from `app_role` directly).
+6. `User`: drop `HasTenantMemberships` and `ownedOrganizations()`; `Role`: drop `OWNER`
+   (and from `byPriority()`); `UserFactory::member()` loses its argument and assigns
+   `MEMBER` globally, `owner()` goes; drop `Organization::class` from `authorizableModels()`;
+   `ListUsersQuery` loses `withCount('ownedOrganizations')` and the users list its owner branch.
+7. `DemoUserSeeder`: drop the organization, the owner user and the `AddOrganizationMember` call.
 
 Everything else (package, `AbstractPolicy`, role enum, `HasAppRole`, seeders, tests) is
 tenancy-agnostic.
@@ -123,26 +141,41 @@ Package mechanics live in the `laravel-authorization-development` skill shipped 
 `apavliukov/laravel-authorization`. App-side facts:
 
 - Roles: `ADMIN` (super — a **global** assignment, `team_id NULL`, bypasses everything),
-  `MEMBER` (non-super, assigned **inside an organization's team**, one per organization).
-  Writers: `TenantMembership::assignGlobal` (in `CreateUser`/`UpdateUser`) for ADMIN,
-  `AddOrganizationMember` / `RemoveOrganizationMember` for memberships. Identity via the
-  package `HasAppRole` trait: `$user->app_role` (highest role held anywhere, **`null` for
-  a user with no role** — `Role::layout()` callers fall back to `Role::default()`) and
+  `OWNER` (the organization's full set: view/update the organization +
+  `transferOwnership`; held only by `owner_id`, derived by the package, never assigned by
+  hand), `MEMBER` (non-super, assigned **inside an organization's team**). Roles are
+  concentric by convention — OWNER ⊇ every lower organization role — the package assumes
+  nothing about it. `Role::byPriority()` = `[ADMIN, OWNER, MEMBER]` is the **explicit**
+  ranking behind `app_role`; enum declaration order means nothing, and the sync throws if
+  the list misses a case. Writers: `TenantMembership::assignGlobal` / `removeGlobal` (in
+  `CreateUser`/`UpdateUser`) for ADMIN, `AddOrganizationMember` / `RemoveOrganizationMember`
+  for memberships, `TransferOrganizationOwnership` for OWNER. Identity via the package
+  `HasAppRole` trait: `$user->app_role` (first role in `byPriority()` held anywhere,
+  **`null` for a user with no role** — callers fall back to `Role::default()`) and
   `$user->is_platform_admin`. Never `hasRole()`, which only sees the active team.
   Presentation helpers (`layout()`, `badgeColor()`) via `App\Support\Roles\HasRolePresentation`.
 - **`MEMBER` returns `[]` from `permissions()` — an active deny-all.** The first grant made
   outside the enum disappears on the next sync; declare `MEMBER` grants in the enum only.
+- Custom abilities: `OrganizationAbility` (`TRANSFER_OWNERSHIP`), declared through
+  `Organization::getCustomAbilities()`; the policy method carries the enum value.
+  `OrganizationPolicy extends TenantScopedPolicy` with the organization as its own tenant,
+  so OWNER's grants reach only the active organization.
 - `SystemAbility::ACCESS_PLATFORM_ADMIN` (`accessPlatformAdmin`) — the deny-all gate is
   registered by the package unconditionally; the app enum only names it (Log Viewer
   auth). Not via `systemAbilities()`.
 - Authorizable models: `Organization`, `User`. Teams: **on** (team = `Organization`).
-  Tenancy declarations: all in `config/authorization.php`, none in the provider.
+  Tenancy and ownership declarations (`owner_key`, `owner_role`, `memberships`): all in
+  `config/authorization.php`, none in the provider.
 - `$user->is_platform_admin` / `app_role` are routing/UX helpers — never authorization.
 - Seeding: `ConsistencySeeder` (deploy) and `DatabaseSeeder` both call the package's
-  `AuthorizationSeeder`. `DemoUserSeeder` creates users through `CreateUser` and
-  memberships through `AddOrganizationMember`. `UserFactory::member($organization = null)`
-  creates an organization when none is given; `admin()` stays global. Policy test base: `tests/Unit/Policies/BasePolicyTestCase.php`
-  (resolves policies from the container).
+  `AuthorizationSeeder`. `DemoUserSeeder` creates users through `CreateUser`, the demo
+  organization through `CreateOrganization` (owner `owner@demo.local`) and memberships
+  through `AddOrganizationMember`. `OrganizationFactory` always creates an owner user and
+  derives the OWNER row (`ownedBy($user)` to pick one); `UserFactory::owner($organization =
+  null)` and `member($organization = null)` create an organization when none is given;
+  `admin()` stays global. Policy test base: `tests/Unit/Policies/BasePolicyTestCase.php`
+  (generic over the policy class, resolves it from the container); the ADMIN bypass is
+  tested through the Gate, not by calling policy methods.
 
 ## Skills
 
@@ -161,6 +194,9 @@ Hand-written cross-project skills stay global: `laravel-app-patterns` above all.
 
 - **No auto-routing area layout.** Canon T2 has `x-layouts.admin` pick the area layout
   from the authenticated user's role. Here `x-layouts.admin` is a single flat shell and
-  the role branch sits one level down: `Role::layout()` feeds `x-dynamic-component` in
-  `admin.ui.navigation.sidebar` (which menu) and `pages/admin/dashboard/index` (which
-  dashboard body). Keep this shape until an area needs genuinely different chrome.
+  the branch sits one level down: `App\Support\Areas\CurrentLayout` feeds
+  `x-dynamic-component` in `admin.ui.navigation.sidebar` (which menu) and
+  `pages/admin/dashboard/index` (which dashboard body). Inside an area the **area**
+  decides (`CurrentArea`), on area-less pages (`/dashboard`, `/settings/*`) the user's
+  `app_role` does via `Role::layout()`. Keep this shape until an area needs genuinely
+  different chrome.

@@ -19,7 +19,7 @@ use Tests\TestCase;
 final class ListOrganizationsQueryTest extends TestCase
 {
     #[Test]
-    public function searches_by_name_and_counts_members(): void
+    public function searches_by_name_and_counts_the_owner_among_the_members(): void
     {
         $acme = Organization::factory()->create(['name' => 'Acme']);
         Organization::factory()->create(['name' => 'Globex']);
@@ -28,7 +28,7 @@ final class ListOrganizationsQueryTest extends TestCase
         $result = new ListOrganizationsQuery()->handle(new ListOrganizationsFilters(search: 'acm'));
 
         $this->assertSame(1, $result->total());
-        $this->assertSame(2, $result->getCollection()->first()?->members_count);
+        $this->assertSame(3, $result->getCollection()->first()?->members_count);
     }
 
     #[Test]
