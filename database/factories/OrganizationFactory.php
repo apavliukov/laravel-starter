@@ -28,7 +28,7 @@ final class OrganizationFactory extends Factory
     public function configure(): self
     {
         return $this->afterCreating(static function (Organization $organization): void {
-            resolve(TenantMembership::class)->transferOwnership($organization, User::query()->findOrFail($organization->owner_id));
+            resolve(TenantMembership::class)->transferOwnership($organization, $organization->owner()->firstOrFail());
         });
     }
 

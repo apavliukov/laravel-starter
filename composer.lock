@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc79533f5e8cd04f2e750cd2f8ae4677",
+    "content-hash": "6ee731efcac831abdb9af4f79a66d881",
     "packages": [
         {
             "name": "apavliukov/laravel-authorization",
-            "version": "v1.3.2",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apavliukov/laravel-authorization.git",
-                "reference": "3714a965e55eeef217d5da0b984d1aa764abb3ce"
+                "reference": "96a57515959d664f28f885e42755beb76e8e643a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apavliukov/laravel-authorization/zipball/3714a965e55eeef217d5da0b984d1aa764abb3ce",
-                "reference": "3714a965e55eeef217d5da0b984d1aa764abb3ce",
+                "url": "https://api.github.com/repos/apavliukov/laravel-authorization/zipball/96a57515959d664f28f885e42755beb76e8e643a",
+                "reference": "96a57515959d664f28f885e42755beb76e8e643a",
                 "shasum": ""
             },
             "require": {
@@ -60,12 +60,12 @@
                     "name": "Aleksandr Pavliukov"
                 }
             ],
-            "description": "Reusable, Spatie-permission-based authorization layer for Laravel: policies, abilities, roles, a permission registry, and a pluggable admin bypass.",
+            "description": "Reusable, Spatie-permission-based authorization layer for Laravel: policies, abilities, roles, a permission registry, tenancy, and a super-admin bypass.",
             "support": {
                 "issues": "https://github.com/apavliukov/laravel-authorization/issues",
-                "source": "https://github.com/apavliukov/laravel-authorization/tree/v1.3.2"
+                "source": "https://github.com/apavliukov/laravel-authorization/tree/v1.6.0"
             },
-            "time": "2026-10-11T14:49:48+00:00"
+            "time": "2026-10-17T19:12:15+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",

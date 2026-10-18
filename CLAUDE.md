@@ -37,14 +37,15 @@ Where the areas *are* materialized today: `components/admin/{platform,member}/na
 
 ## Tenancy: package layer, membership in `model_has_roles` (reference implementation)
 
-The canon tenancy layer from `apavliukov/laravel-authorization` ^1.3 — mechanics in the
+The canon tenancy layer from `apavliukov/laravel-authorization` ^1.6 — mechanics in the
 `laravel-authorization-development` skill, design history in the package's
 `docs/TENANCY-DESIGN.md` (§7 = this shape). App-side binding:
 
 - Tenant = `App\Models\Organization`; it is also the Spatie permissions team
   (`config/permission.php` teams on). Configured in `config/authorization.php`: model,
-  `foreign_key` `organization_id`, `session_key`, `strict` outside production, areas
-  `admin.platform.*` / `admin.member.*`.
+  `foreign_key` `organization_id`, `session_key`, `strict` outside production, ownership
+  keys. The UI areas are app routing: `App\Support\Areas\CurrentLayout` holds the
+  `admin.platform.*` / `admin.member.*` patterns (package 1.6 dropped `CurrentArea`).
 - **Membership = a role row in `model_has_roles` with `team_id`, nothing else.** There is
   no `users.organization_id` and no pivot. `Organization::members()` and
   `User::tenants()` are the package relations over that table; writes go through
@@ -88,8 +89,8 @@ Retrofitting tenancy is expensive, removing it is not — so the template ships 
 For a single-tenant project, do this once, right after seeding:
 
 1. `config/authorization.php`: `tenancy.model => null` — switches the whole package layer
-   off (scope, resolver, middleware registration, ownership). Keep the file for `areas`.
-   The `accessPlatformAdmin` deny-all gate stays registered by the package regardless.
+   off (scope, resolver, middleware registration, ownership); the file keeps only that
+   `null`. The `accessPlatformAdmin` deny-all gate stays registered by the package regardless.
 2. `config/permission.php`: `teams => false`, `models.team => null`.
 3. `bootstrap/app.php`: drop `SetCurrentTenant` from `web`.
 4. `routes/admin.php`: member group → no middleware (platform keeps `EnsurePlatformArea`,
@@ -162,7 +163,7 @@ Package mechanics live in the `laravel-authorization-development` skill shipped 
   so OWNER's grants reach only the active organization.
 - `SystemAbility::ACCESS_PLATFORM_ADMIN` (`accessPlatformAdmin`) — the deny-all gate is
   registered by the package unconditionally; the app enum only names it (Log Viewer
-  auth). Not via `systemAbilities()`.
+  auth). Any further model-less gate is a plain `Gate::define` in the provider.
 - Authorizable models: `Organization`, `User`. Teams: **on** (team = `Organization`).
   Tenancy and ownership declarations (`owner_key`, `owner_role`, `memberships`): all in
   `config/authorization.php`, none in the provider.
@@ -197,6 +198,7 @@ Hand-written cross-project skills stay global: `laravel-app-patterns` above all.
   the branch sits one level down: `App\Support\Areas\CurrentLayout` feeds
   `x-dynamic-component` in `admin.ui.navigation.sidebar` (which menu) and
   `pages/admin/dashboard/index` (which dashboard body). Inside an area the **area**
-  decides (`CurrentArea`), on area-less pages (`/dashboard`, `/settings/*`) the user's
+  decides (route name against `CurrentLayout`'s own patterns), on area-less pages
+  (`/dashboard`, `/settings/*`) the user's
   `app_role` does via `Role::layout()`. Keep this shape until an area needs genuinely
   different chrome.

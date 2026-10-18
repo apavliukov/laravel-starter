@@ -1,0 +1,13 @@
+# PhpStorm-only override for the Sail interpreter. The Sail image has no default user, so
+# `docker compose exec` (and therefore anything the IDE runs) is root and leaves root-owned
+# files in storage/, vendor/ and the container's /tmp. `docker compose run` honours `user:`,
+# `exec` does not — so the interpreter uses this file in "Always start a new container" mode.
+# `sail up` never reads it.
+services:
+    app:
+        user: "${WWWUSER:-1337}:${WWWGROUP:-1337}"
+        # start-container needs root (usermod, supervisord); nothing here needs it.
+        entrypoint: []
+        environment:
+            # uid ${WWWUSER} has no passwd entry in the image; give tools a writable home.
+            HOME: /tmp

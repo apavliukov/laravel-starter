@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Support\Areas;
 
-use AlexPavliukov\Authorization\Tenancy\CurrentArea;
 use App\Enums\Policies\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,25 +17,27 @@ use Illuminate\Support\Str;
  */
 final readonly class CurrentLayout
 {
-    public function __construct(private CurrentArea $area, private Request $request) {}
+    /** @var array<string, string> layout name => route-name pattern */
+    private const array AREAS = [
+        'platform' => 'admin.platform.*',
+        'member' => 'admin.member.*',
+    ];
+
+    public function __construct(private Request $request) {}
 
     public function name(): string
     {
-        if ($this->inArea()) {
-            return (string) $this->area->current();
+        $routeName = $this->request->route()?->getName() ?? '';
+
+        foreach (self::AREAS as $layout => $pattern) {
+            if (Str::is($pattern, $routeName)) {
+                return $layout;
+            }
         }
 
         $user = $this->request->user();
         $role = $user instanceof User ? $user->app_role : null;
 
         return ($role instanceof Role ? $role : Role::default())->layout();
-    }
-
-    private function inArea(): bool
-    {
-        /** @var array<string, string> $patterns */
-        $patterns = config('authorization.areas', []);
-
-        return Str::is($patterns, $this->request->route()?->getName() ?? '');
     }
 }

@@ -37,3 +37,6 @@ yarn-error.log
 # State file (don’t commit)
 .yarn/install-state.gz
 
+
+# Machine-local Sail override
+docker-compose.override.yml

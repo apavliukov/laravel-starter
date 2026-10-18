@@ -46,22 +46,4 @@ return [
         // A user may belong to several organizations; 'single' restricts to one.
         'memberships' => 'multiple',
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Areas
-    |--------------------------------------------------------------------------
-    |
-    | area name => route-name pattern (Str::is wildcards). CurrentArea resolves
-    | the area of the current route from these; a session view mode is the
-    | fallback. Order matters: the first match wins, the first entry is the
-    | default.
-    |
-    */
-
-    'areas' => [
-        'platform' => 'admin.platform.*',
-        'member' => 'admin.member.*',
-    ],
-
 ];
