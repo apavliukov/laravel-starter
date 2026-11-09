@@ -108,8 +108,29 @@ staged files.
 
 Internal tools: `/horizon`, `/telescope`, `/log-viewer` and `/mailbook`.
 
+## Architecture
+
+No service or repository layer. A Livewire component authorizes and validates, hands a
+DTO to an Action (writes) or a Query (reads), and renders the result. One request, read
+top to bottom:
+
+| Layer | Reference class | Role |
+|-------|-----------------|------|
+| Component | [`Livewire\Admin\Users\EditUser`](app/Livewire/Admin/Users/EditUser.php) | `Gate::authorize`, validate the form, call the Action — no business logic |
+| Form Object | [`Livewire\Admin\Users\Forms\UserForm`](app/Livewire/Admin/Users/Forms/UserForm.php) | Validation rules, shared by create and edit; converts itself into a DTO |
+| DTO | [`Dto\Users\UpdateUserInput`](app/Dto/Users/UpdateUserInput.php) | `final readonly`, typed input — the Action never sees a request or an array |
+| Action | [`Actions\Users\UpdateUser`](app/Actions/Users/UpdateUser.php) | One invokable class per write, in a transaction, dependencies injected |
+| Query | [`Queries\Users\ListUsersQuery`](app/Queries/Users/ListUsersQuery.php) | One class per read: filters DTO in, paginator out, eager loads declared here |
+
+Actions and Queries know nothing about Livewire, so they are unit-tested on their own
+(`tests/Unit/{Actions,Queries,Dto}/Users/`) and the components through Livewire
+(`tests/Feature/Admin/Users/`). The whole resource lives in
+[`app/Livewire/Admin/Users/`](app/Livewire/Admin/Users/) and
+[`resources/views/livewire/admin/users/`](resources/views/livewire/admin/users/).
+
 ## Further reading
 
+- `CHANGELOG.md` — release history
 - `CLAUDE.md` — project manifest: topology, tenancy, authorization, deviations from canon
 - `.ai/rules/index.md` — path-scoped conventions, read before editing the files they cover
 - `docs/superpowers/specs/` — design documents behind the larger changes
