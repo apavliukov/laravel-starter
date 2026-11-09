@@ -181,9 +181,11 @@ Package mechanics live in the `laravel-authorization-development` skill shipped 
 ## Skills
 
 All Boost skills live in `.claude/skills/`, **tracked in git** (as in oohire `58d75a6e`:
-same reasoning as any generated file, and a fresh clone works without `boost:update`),
-installed by `boost:update` and version-matched to this project (Laravel 13, Livewire 4, Flux 2, Tailwind 4,
+same reasoning as any generated file, and a fresh clone of an existing project works
+without `boost:update`), installed by `boost:update` and version-matched to this project (Laravel 13, Livewire 4, Flux 2, Tailwind 4,
 laravel-permission 8). Never hand-edit them; overrides go in `.ai/skills/{name}/SKILL.md`.
+A **new project seeded from this template** runs `boost:install` once (README,
+Installation) to generate its own guidelines, skills and MCP config.
 
 `laravel-finalize` ships the translation checker
 (`vendor/bin/sail php vendor/bin/check-translations`); the Stop hook in
